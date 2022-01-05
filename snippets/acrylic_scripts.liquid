@@ -1,0 +1,261 @@
+<script>
+  var baseImage
+  var baseImageGray
+  var listenerAdded = false;
+  var rotated = false;
+  var allProducts = []
+  var handles = [
+    [0, '/products/10x20-acrylic-wall-decor'],
+    [1, '/products/12x12-acrylic-wall-decor'],
+    [2, '/products/12x18-acrylic-wall-decor'],
+    [3, '/products/12x36-acrylic-wall-decor'],
+    [4, '/products/14x11-acrylic-wall-decor'],
+    [5, '/products/16x20-acrylic-wall-decor'],
+    [6, '/products/18x12-acrylic-wall-decor'],
+    [7, '/products/20x16-acrylic-wall-decor'],
+    [8, '/products/20x30-acrylic-wall-decor'],
+    [9, '/products/24x36-acrylic-wall-decor'],
+    [10, '/products/30x20-acrylic-wall-decor'],
+    [11, '/products/36x12-acrylic-wall-decor'],
+    [12, '/products/36x24-acrylic-wall-decor']
+
+
+  ]
+
+  imageUploaded = false;
+  var grayscaled = false
+  $(document).ready(function () {
+    $('.currency_symbol').text('$')
+    $('.size-select-box:eq(0)').addClass("10x20")
+    $('.size-select-box:eq(1)').addClass("12x12")
+    $('.size-select-box:eq(2)').addClass("12x18")
+    $('.size-select-box:eq(3)').addClass("12x36")
+    $('.size-select-box:eq(4)').addClass("14x11")
+    $('.size-select-box:eq(5)').addClass("16x20")
+    $('.size-select-box:eq(6)').addClass("18x12")
+    $('.size-select-box:eq(7)').addClass("20x16")
+    $('.size-select-box:eq(8)').addClass("20x30")
+    $('.size-select-box:eq(9)').addClass("24x36")
+    $('.size-select-box:eq(10)').addClass("30x20")
+    $('.size-select-box:eq(11)').addClass("36x12")
+    $('.size-select-box:eq(12)').addClass("36x24")
+
+    $('#atcwrapper').click(function () {
+      $('#loadingButton').removeClass('is_hidden')
+      $('#atcwrapper').hide()
+      var button = document.querySelector('#loadingButton');
+      var content = document.querySelector('#loadingButtonContent');
+      setTimeout(function () {
+        content.textContent = 'Processing Image'
+        var counter = 0;
+        var loadingDotInterval = setInterval(function () {
+          if (counter == 30) {
+            console.log('adding newline')
+            content.textContent = content.textContent + '\n'
+          }
+          if (counter > 48) {
+            clearInterval(loadingDotInterval)
+          }
+          counter++
+          if (counter < 30) {
+            content.textContent = 'Processing Image' + '.'.repeat(counter)
+          } else {
+            content.textContent = 'Processing Image...................................\n' + '.'.repeat(counter - 30)
+          }
+        }, 2000)
+      }, 5000)
+    })
+    var height = window.location.pathname.split('/').pop().split('x')[0]
+    var width = window.location.pathname.split('/').pop().split('x')[1].split('-')[0]
+    var sizetext = height + "x" + width
+
+    console.log(sizetext)
+    $('.' + sizetext).addClass('is_selected')
+
+    //load popular sizes info
+    $('.currency_symbol').text('$')
+
+    handles.map(handle => {
+      $.getJSON(handle[1], function (product) {
+        allProducts[handle[0]] = product
+      })
+    })
+
+    //Put in popular-size prices
+    var allProductInfoLoaded = setInterval(function () {
+      if (handles.length === allProducts.length) {
+
+        clearInterval(allProductInfoLoaded)
+
+        for (var j = 0; j < handles.length; j++) {
+          $('.option_price:eq(' + j + ')').text((allProducts[j].price / 100).toFixed(2))
+          $('.option_compare_price:eq(' + j + ')').text('$' + (allProducts[j].compare_at_price / 100).toFixed(2))
+        }
+      }
+    }, 1000)
+
+
+    //Change Size
+    $('.size-select-box').click(function () {
+      if (!$(this).hasClass('is_selected')) {
+        $('#grayscale span').text('Change to Black and White')
+        grayscaled = false
+        rotated = false
+        $('body .product-single__photos').addClass('is_loading')
+        $('#customily-cart-btn').addClass('button_lockout')
+        $('.size-select-box').removeClass('is_selected')
+        $(this).addClass('is_selected')
+        var regex = /([0-9])+/gm
+        var canvasDimensions = $(this).find('.size_text').text().match(regex)
+        var canvasHeight = canvasDimensions[0]
+        var canvasWidth = canvasDimensions[1]
+        var newHandle = canvasHeight + 'x' + canvasWidth + '-acrylic-wall-decor'
+        $.getJSON("/products/" + newHandle + '.js', function (product) {
+          $('#productTitle').text(product.title)
+          $('.hidden_sel').first().val(product.variants[0].id)
+          $('.breadcrumb').first().find('span:eq(1)').text(product.title)
+
+          window.customily.options.handle = newHandle
+          window.customily.initialize()
+          if (!listenerAdded) {
+            listenerAdded = true;
+            engraver.canvasWrapper.addEventListener('productLoaded', function () {
+              engraver.setImage(1, baseImage)
+            })
+          }
+        })
+        var imageFullyUploaded = setInterval(function () {
+          if (engraver.initReady) {
+            var fileInput = $('.customily-file-input input').last()
+            setTimeout(function () {
+              $('#customily-cart-btn').removeClass('button_lockout')
+              $('body .product-single__photos').removeClass('is_loading')
+            }, 1000)
+            clearInterval(imageFullyUploaded)
+          }
+        }, 500)
+      }
+    })
+
+
+    //Get the uploaded 
+    var detectCustomily = setInterval(function () {
+      if ($('.customily-file-input').length > 0) {
+        clearInterval(detectCustomily)
+        customilyLoaded()
+      }
+    }, 500)
+
+    function customilyLoaded() {
+      $('#customUploadBtn').click(function () {
+        $('.customily-file-input input').last().click()
+      })
+      $('#change-btn').click(function () {
+        $('.customily-file-input input').last().click()
+      })
+      $('.customily-file-input input').last().change(function (e) {
+        $('#grayscale span').text('Change to Black and White')
+        grayscaled = false
+        rotated = false
+        if (!imageUploaded) {
+          $('.customily-mobile-controls').first().prepend('<div class="custom-btns--wrap"><div id="grayscale"><span>Change to Black and White</span></div><div id="rotate"><span>Rotate Canvas</span></div></div>')
+          $('#rotate').click(function () {
+            rotateCanvas()
+          })
+          $('#grayscale').click(function () {
+            grayscale()
+          })
+          imageUploaded = true
+        }
+        $('.product-main--contents .product-single__photos').addClass('photo_loaded')
+        $('.post-upload').show()
+        $('.pre-upload').hide()
+        var imageFile = e.target.files[0]
+        $('#filename').text(imageFile.name)
+        var reader = new FileReader()
+        reader.readAsDataURL(imageFile)
+        reader.onload = function () {
+          baseImage = reader.result
+          var cnv = document.getElementById("output")
+          var cnx = cnv.getContext("2d")
+          var img = new Image()
+          img.src = baseImage
+          img.onload = function () {
+            cnv.width = img.width
+            cnv.height = img.height
+            var width = img.width
+            var height = img.height
+            cnx.drawImage(img, 0, 0)
+            var imgPixels = cnx.getImageData(0, 0, width, height)
+            for (var y = 0; y < height; y++) {
+              for (var x = 0; x < width; x++) {
+                var i = (y * 4) * width + x * 4
+                var avg = (imgPixels.data[i] + imgPixels.data[i + 1] + imgPixels.data[i + 2]) / 3
+                imgPixels.data[i] = avg
+                imgPixels.data[i + 1] = avg
+                imgPixels.data[i + 2] = avg
+              }
+            }
+            cnx.putImageData(imgPixels, 0, 0, 0, 0, imgPixels.width, imgPixels.height)
+            baseImageGray = cnv.toDataURL()
+          }
+        }
+      })
+    }
+  })
+  function grayscale() {
+    if (grayscaled) {
+      grayscaled = false;
+      $('#grayscale span').text('Change to Black and White')
+      engraver.setImage(1, baseImage)
+    }
+    else {
+      grayscaled = true;
+      $('#grayscale span').text('Change to Color')
+      engraver.setImage(1, baseImageGray)
+    }
+  }
+
+  function rotateCanvas() {
+    var regex = /([0-9])+/gm
+    var canvasDimensions = $('.size-select-box.is_selected').first().find('.size_text').text().match(regex)
+    var canvasHeight = canvasDimensions[0]
+    var canvasWidth = canvasDimensions[1]
+    if (canvasHeight != canvasWidth) {
+      $('#grayscale span').text('Change to Black and White')
+      grayscaled = false
+      $('body .product-single__photos').addClass('is_loading')
+      $('#customily-cart-btn').addClass('button_lockout')
+      if (rotated) {
+        var newHandle = canvasHeight + 'x' + canvasWidth + '-acrylic-wall-decor'
+        rotated = false
+      }
+      else {
+        var newHandle = canvasWidth + 'x' + canvasHeight + '-acrylic-wall-decor'
+        rotated = true
+      }
+      $.getJSON("/products/" + newHandle + '.js', function (product) {
+        $('#productTitle').text(product.title)
+        $('.breadcrumb').first().find('span:eq(1)').text(product.title)
+        $('.hidden_sel').first().val(product.variants[0].id)
+        window.customily.options.handle = newHandle
+        window.customily.initialize()
+        if (!listenerAdded) {
+          listenerAdded = true;
+          engraver.canvasWrapper.addEventListener('productLoaded', function () {
+            engraver.setImage(1, baseImage)
+          })
+        }
+      })
+      var imageFullyUploaded = setInterval(function () {
+        if (engraver.initReady) {
+          setTimeout(function () {
+            $('#customily-cart-btn').removeClass('button_lockout')
+            $('body .product-single__photos').removeClass('is_loading')
+          }, 1000)
+          clearInterval(imageFullyUploaded)
+        }
+      }, 500)
+    }
+  }
+</script>

@@ -1,0 +1,144 @@
+<script>
+  var iosDevice = !!navigator.platform && /iPad|iPhone|iPod/.test(navigator.platform)
+  var imageSizes = { //Stores all wall displays HxW values in the order they are uploaded.
+    'Linville': [16, 20, 10, 8, 10, 8],
+    'Stairway': [20, 16, 10, 8, 14, 11, 14, 11, 10, 8],
+    'Catawba': [12, 18, 8, 8, 12, 8, 8, 12, 8, 12, 8, 8, 12, 8, 8, 12, 8, 12],
+    'Glassmine': [24, 18, 12, 18, 10, 8, 10, 8],
+    'Shunkawauken': [8, 10, 18, 24, 18, 12, 8, 10],
+    'Mingo': [16, 30, 20, 20, 12, 18, 20, 20, 20, 20, 12, 18, 20, 20],
+    'Hickory': [26, 26, 12, 12, 12, 12, 12, 12, 12, 12],
+    'Cullasaja': [26, 18, 12, 18, 12, 18],
+    'Wildcat': [36, 24, 8, 10, 12, 18, 8, 10, 8, 10, 12, 18, 8, 10],
+    'Crabtree': [37, 24, 11, 14, 11, 14, 11, 14],
+    'Setrock': [24, 34, 24, 18, 24, 18],
+    'Sunburst': [24, 38, 24, 18, 12, 18, 12, 18, 24, 18, 12, 18, 12, 18],
+    'Rainbow': [16, 24, 18, 12, 18, 12, 14, 11, 14, 11],
+    'Silver': [20, 16, 14, 11, 8, 10]
+  }
+  
+
+  window.addEventListener('DOMContentLoaded', function(){
+    
+  document.getElementById('hidden_prop_1').value = 'stand-in-value'	//This is to fix an issue where wall-displays with no options are not created on Trello
+  document.getElementById('hidden_prop_2').value = 'stand-in-value'	//This is to fix an issue where wall-displays with no options are not created on Trello
+
+  $('#atcwrapper').unbind().click(function(){
+    console.log('atcwrapper clicked')
+    $('#loadingButton').removeClass('is_hidden')
+    $('#atcwrapper').hide()
+    var button = document.querySelector('#loadingButton');
+    var content = document.querySelector('#loadingButtonContent');
+    setTimeout(function(){
+      content.textContent = 'Processing Image'
+      var counter = 0;
+      var loadingDotInterval = setInterval(function(){
+        if (counter == 30){
+          console.log('adding newline')
+          content.textContent = content.textContent + '\n'
+        }
+        if( counter > 48){
+          clearInterval(loadingDotInterval)
+        }
+        counter ++
+        if (counter < 30){
+          content.textContent = 'Processing Image' + '.'.repeat(counter)
+        }else{
+          content.textContent = 'Processing Image...................................\n' + '.'.repeat(counter-30)
+        }
+      }, 2000)
+    }, 5000)
+  })
+    
+    
+    
+    var detectCustomily = setInterval(function(){
+      if($('.customily-file-input').length > 0){
+        clearInterval(detectCustomily)
+        customilyLoaded()
+      }
+    },500)
+    
+    var detectHulkapps = setInterval(function(){
+      if($('.hulkapps_option_set').length > 0){
+        clearInterval(detectHulkapps)
+        hulkappsLoaded()
+      }
+    },500)
+
+    function customilyLoaded(){
+      var count = 0;
+      var selectedWallDisplay = imageSizes[$('#wallDisplayUniqueName').text().split(' ')[0]] //Add size text to upload buttons
+      $('.customily-download-button').each(function(){
+        var h = selectedWallDisplay[count * 2]
+        var w = selectedWallDisplay[count*2+1]
+        count += 1
+        $(this).prepend('<div class = "button-info">Canvas #' + count + ' - ' + h + '"' + ' x ' + w + '"' + '</div>')
+      })
+      $('#productTitle').prepend(count + " ")
+      
+      $('.customily-file-input').on('change', function(){
+        count = 0
+        $('.change-photo-btn').each(function(){
+          count ++
+        })
+        if(count >= selectedWallDisplay.length/2 -1){
+          $('#customily-cart-btn').css('filter','none')
+          $('#customily-cart-btn').css('pointer-events','all')
+        }
+        $('.product-main--contents .product-single__photos').addClass('photo_loaded')
+		if (iosDevice){
+          imageNumber = $('.customily-file-input').index($(this)) + 1
+		  imageName = 'Image' + imageNumber + '.' + $(this).find('input').val().split('.').pop()
+		}else{
+		  imageName = $(this).find('input').val().split('\\').pop()
+		}
+        button = $(this).find('div')
+        button.contents().filter(function(){return this.nodeType == 3;}).first().replaceWith(imageName)
+        button.addClass("uploaded_to")
+        $(this).addClass("uploaded_to")
+        if($(this).find('.change-photo-btn').length  == 0){
+          $('<div class = "change-photo-btn">Change Your Photo</div>').insertAfter($(this).find('label'))
+    	  $(this).find('.change-photo-btn').click(function(){
+      		$(this).siblings()[0].click()
+    	  })
+        }
+        $('#hiddenInputs').removeClass('is_hidden')
+      })
+    }
+    
+    
+    function hulkappsLoaded(){
+      $.getJSON("/cart.js", function(response){
+        var alreadyHasFastShipping = false;
+        var numitems = response.item_count;
+        for(var i = 0; i < numitems; i++){
+          var digital_proof = response.items[i].properties['Digital Proof']
+          var fast_shipping = response.items[i].properties['Next Day Shipping']
+          if (fast_shipping != undefined ){
+            if(!fast_shipping.includes('No')){
+              $('.hulkapps_option:eq(0)').addClass('is_hidden')
+              $('.hulkapps_option:eq(1)').addClass('is_hidden');
+            }
+          }
+          if(digital_proof != undefined){
+            if(!digital_proof.includes('No')){
+              $('.hulkapps_option:eq(1)').addClass('is_hidden');
+            }
+          }
+        }
+      })
+      $('.hulkapps_check_option').each(function(){
+        if ($(this).text().includes("Digital")){
+          $(this).parent().append("<div class = 'hulkapps-tooltip'><span class = 'hulkapps-tooltip'><img style = 'width: 15px;' src = 'https://productoption.hulkapps.com/tooltip.svg'></span><div class = 'hulkapps-tooltip-inner'>Receive a preview of how your finished canvas will look (This option adds 3 days to shipping)</div></div>")
+        }
+        if ($(this).text().includes("Next Day")){
+          $(this).parent().append("<div class = 'hulkapps-tooltip'><span class = 'hulkapps-tooltip'><img style = 'width: 15px;' src = 'https://productoption.hulkapps.com/tooltip.svg'></span><div class = 'hulkapps-tooltip-inner'>Your entire order will be shipped on the next available business day</div></div>")
+        }
+        if ($(this).text().includes("Blind")){
+          $(this).parent().append("<div class = 'hulkapps-tooltip'><span class = 'hulkapps-tooltip'><img style = 'width: 15px;' src = 'https://productoption.hulkapps.com/tooltip.svg'></span><div class = 'hulkapps-tooltip-inner'>Removes the CanvasPrints logo from the back of the frame and the packaging</div></div>")
+        }
+      })
+    }
+  })
+</script>

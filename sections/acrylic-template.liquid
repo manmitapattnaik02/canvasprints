@@ -1,0 +1,784 @@
+<style>
+  #confirmation_text {
+    font-size: 12px;
+  }
+
+  #loadingButton.is_hidden {
+    display: none;
+  }
+
+  #loadingButton {
+    width: 100%;
+    max-width: 300px;
+    min-height: auto;
+    background-color: #4d4d4d;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+  }
+
+  #loadingButtonContent {
+    margin-left: 20px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: normal;
+    color: #fff;
+    font-family: sans-serif;
+    font-size: 22px;
+    font-weight: 300;
+  }
+
+  #productPrice {
+    font-size: 30px;
+  }
+
+  #productTitle {
+    margin: 0;
+  }
+
+  .size-select-box {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+    border: 2px solid #b7b7b7;
+    border-radius: 10px;
+    margin-bottom: 12px;
+    padding-left: 20px;
+    transition-duration: 200ms;
+    -webkit-transition-duration: 200ms;
+    cursor: pointer;
+  }
+
+  .post-upload {
+    display: none;
+  }
+
+  .size-select-box:hover {
+    border: 2px solid #ffe35f;
+    transform: translateX(5px);
+    -webkit-transform: translateX(5px);
+  }
+
+  .size-select-box.is_selected {
+    border: 2px solid #ffe35f;
+  }
+
+  .popular_sizes_div {
+    margin-left: 20px;
+  }
+
+  .currency_symbol {
+    font-size: 17px;
+    display: inline-block;
+    line-height: 15px;
+    left: 0;
+    top: 4px;
+    color: #e50085;
+    font-family: 'coolvetica Bold';
+  }
+
+  .option_price {
+    position: relative;
+    color: #e50085;
+    font-size: 25px;
+    font-family: "coolvetica Bold";
+  }
+
+  .size_text {
+    display: inline-block;
+    width: 45%;
+    font-family: "coolvetica Light";
+    font-weight: 700;
+    font-size: 22px;
+    color: #ac76b8;
+  }
+
+  .option_compare_price {
+    color: #854dff;
+    margin-left: 12%;
+    font-size: 17px;
+    font-family: "coolvetica Bold";
+    text-decoration: line-through;
+  }
+
+  .button_lockout {
+    display: none !important;
+  }
+
+  .call-to-action-text {
+    font-size: 25px;
+    line-height: 1.7em !important;
+    letter-spacing: 1px !important;
+    color: #000000 !important;
+    text-transform: none !important;
+  }
+
+  #product-description div b {
+    font-size: 20px;
+  }
+
+  #customUploadBtn {
+    width: 100%;
+    cursor: pointer;
+    margin: 15px 0;
+    background-color: #ed1b67 !important;
+    color: #fff;
+    border: 1px solid #ed1b67 !important;
+    border-radius: 8px;
+    line-height: 40px;
+    text-align: center;
+    font-style: normal;
+    white-space: normal;
+    vertical-align: middle;
+    font-size: 16px;
+    font-weight: 500;
+  }
+
+  .upload-info {
+    margin-top: 20px;
+  }
+
+  .heading-title {
+    font-family: 'coolvetica Light';
+    font-size: 18px;
+    color: black;
+    font-weight: 700;
+  }
+
+  #filename {
+    font-size: 14px;
+    font-family: 'coolvetica Light';
+    font-weight: 600;
+    padding: 0 15px;
+  }
+
+  #cl_optionsapp {
+    display: none;
+  }
+
+  #change-btn {
+    margin-left: 5px;
+    display: inline-block;
+    line-height: 16px;
+    font-family: 'coolvetica Light';
+    font-size: 15px;
+    color: #4e6fad;
+    font-weight: 700;
+    border-bottom: 1px solid #4e6fad;
+    cursor: pointer;
+  }
+
+  #product-bullets {
+    list-style: disc;
+    margin-top: 20px;
+    margin-left: 20px;
+  }
+
+
+  #customily-cart-btn.button_lockout {
+    pointer-events: none;
+    filter: grayscale(100%);
+  }
+
+  #output {
+    display: none;
+  }
+
+  /*#customily-cart-btn {
+    border-radius: 8px;
+    display: block;
+  }*/
+  
+  #customily-cart-btn {
+    border-radius: 8px;
+    display: none !important;
+  }
+
+  .colored-wrap-info p.product-ratings {
+    display: inline-block;
+    float: right;
+    margin: 2px 6px 0 0;
+  }
+
+  .colored-wrap-info {
+    border-radius: 8px !important;
+    background-color: #f4f4f4 !important;
+    padding: 20px;
+  }
+
+  @media only screen and (max-width: 600px) {
+    #product-description {
+      display: none !important;
+    }
+
+  }
+
+  @media screen and (max-width: 975px) {
+    #customily-cart-btn {
+      width: 100%;
+    }
+
+    .size_text {
+      width: 30% !important;
+    }
+
+    #shopify-section-product-guarantee {
+      margin-left: -30px !important;
+      margin-right: -30px !important;
+    }
+  }
+
+  #shopify-section-product-guarantee {
+    margin-left: -60px;
+    margin-right: -60px;
+  }
+</style>
+<link data-instant-track rel="stylesheet" type="text/css"
+  href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" class="gf-style" />
+<canvas id="output"></canvas>
+<!--End_Gem_Page_Header_Script-->
+{%- for tag in customer.tags -%}{%- if tag contains 'ws_group' %}{% assign wholesaler = true %}{%- endif -%}{%- endfor
+-%}
+<div itemtype="http://schema.org/Product" id="ProductSection" data-section-id="{{ section.id }}"
+  data-section-type="product-template" data-image-zoom-type=""
+  data-show-extra-tab="{{ section.settings.show_extra_tab }}"
+  data-extra-tab-content="{{ section.settings.extra_tab_content }}" data-enable-history-state="true">
+
+  {% case section.settings.add_to_cart_width %}
+  {% when 'small' %}
+  {%- assign btn_class = 'btn--wide' -%}
+  {%- assign productform_class = 'product-form--wide' -%}
+  {% when 'medium' %}
+  {%- assign btn_class = 'btn--wide' -%}
+  {%- assign productform_class = 'product-form--wide' -%}
+  {% when 'large' %}
+  {%- assign btn_class = 'btn--full' -%}
+  {%- assign productform_class = 'product-form--full' -%}
+  {% endcase %}
+
+  {% if section.settings.add_to_cart_width != 'small' %}
+  <style>
+    @media screen and (min-width: 769px) {
+
+      .single-option-selector,
+      .quantity-selector {
+          {
+          % if section.settings.add_to_cart_width=='medium'%
+        }
+
+        min-width: 50%;
+
+          {
+          % else %
+        }
+
+        min-width: 100%;
+
+          {
+          % endif %
+        }
+      }
+    }
+  </style>
+  {% endif %}
+  <meta itemprop="url" content="{{ shop.url }}{{ product.url }}">
+  <meta itemprop="image" content="{{ product.featured_image.src | img_url: 'grande' }}">
+
+  <div class="section-header section-header--breadcrumb">
+    {% include 'breadcrumb' %}
+  </div>
+  {%- comment -%}
+  Adding customily sources
+  {%- endcomment -%}
+  {% include 'customily-sources' %}
+
+  <div class="product-single custom--select_size">
+    <div class="grid product-single__hero">
+      <div class="grid__item one-half product-main--contents">
+        <!-- <div class="grid__item product-main--contents"> -->
+        {% if section.settings.product_thumbnails_position == 'below' or product.images.size < 2 %} <div
+          class="product-single__photos">
+          {%- comment -%}
+          Adding customily canvas
+          {%- endcomment -%}
+          {% include 'customily-canvas' %}
+
+          {% assign featured_image = product.selected_or_first_available_variant.featured_image | default:
+          product.featured_image %}
+          {% for image in product.images %}
+          {% capture img_id %}ProductImage-{{ image.id }}{% endcapture %}
+          {% capture img_wrapper_id %}ProductImageWrapper-{{ image.id }}{% endcapture %}
+          {%- assign img_url = image | img_url: '1x1' | replace: '_1x1.', '_{width}x.' -%}
+          {% include 'image-style' with image: image, small_style: false, width: 700, height: 1024, wrapper_id:
+          img_wrapper_id, img_id: img_id %}
+
+          <div id="{{ img_wrapper_id }}"
+            class="product-single__image-wrapper supports-js{% unless featured_image == image %} hide{% endunless %}"
+            data-image-id="{{ image.id }}">
+            <div style="padding-top:{{ 1 | divided_by: image.aspect_ratio | times: 100}}%;">
+              <img id="{{ img_id }}"
+                class="product-single__image lazyxload{% unless featured_image == image %} lazyxpreload{% endunless %}"
+                src="{{ image | img_url: '600x600' }}" data-src="{{ img_url }}"
+                data-widths="[180, 370, 540, 740, 900, 1080, 1296, 1512, 1728, 2048]"
+                data-aspectratio="{{ image.aspect_ratio }}" data-sizes="auto" alt="{{ image.alt | escape }}">
+            </div>
+          </div>
+          {% endfor %}
+
+          <noscript>
+            <img src="{{ featured_image | img_url: '1024x1024', scale: 2 }}" alt="{{ featured_image.alt | escape }}">
+          </noscript>
+
+      </div>
+      {% if product.images.size > 1 %}
+      <ul class="product-single__thumbnails grid-uniform" id="ProductThumbs">
+        {% for image in product.images %}
+        <li class="grid__item wide--one-quarter large--one-third medium-down--one-third">
+          <a data-image-id="{{ image.id }}" href="{{ image.src | img_url: '1024x1024' }}"
+            class="product-single__thumbnail">
+            <img src="{{ image.src | img_url: 'grande' }}" alt="{{ image.alt | escape }}">
+          </a>
+        </li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+
+      {% else %}
+      <div class="grid">
+        <div class="grid__item four-fifths product-single__photos" id="ProductPhoto">
+          {%- comment -%}
+          Adding customily canvas
+          {%- endcomment -%}
+          {% include 'customily-canvas' %}
+          {% assign featured_image = product.selected_or_first_available_variant.featured_image | default:
+          product.featured_image %}
+
+          {% for image in product.images %}
+          {% capture img_id %}ProductImage-{{ image.id }}{% endcapture %}
+          {% capture img_wrapper_id %}ProductImageWrapper-{{ image.id }}{% endcapture %}
+          {%- assign img_url = image | img_url: '1x1' | replace: '_1x1.', '_{width}x.' -%}
+          {% include 'image-style' with image: image, small_style: false, width: 700, height: 1024, wrapper_id:
+          img_wrapper_id, img_id: img_id %}
+
+          <div id="{{ img_wrapper_id }}"
+            class="product-single__image-wrapper supports-js{% unless featured_image == image %} hide{% endunless %}"
+            data-image-id="{{ image.id }}">
+            <div style="padding-top:{{ 1 | divided_by: image.aspect_ratio | times: 100}}%;">
+              <img id="{{ img_id }}"
+                class="qsmzPhotoFront product-single__image lazyxload{% unless featured_image == image %} lazyxpreload{% endunless %}"
+                src="{{ image | img_url: '600x600' }}" data-src="{{ img_url }}"
+                data-widths="[180, 370, 540, 740, 900, 1080, 1296, 1512, 1728, 2048]"
+                data-aspectratio="{{ image.aspect_ratio }}" data-sizes="auto" alt="{{ image.alt | escape }}">
+            </div>
+          </div>
+          {% else %}
+          <img src="{{ featured_image | img_url: '1024x1024', scale: 2 }}" alt="{{ featured_image.alt | escape }}">
+          {% endfor %}
+
+          <noscript>
+            <img src="{{ featured_image | img_url: '1024x1024', scale: 2 }}" alt="{{ featured_image.alt | escape }}">
+          </noscript>
+        </div>
+        <div class="grid__item one-fifth">
+          <ul class="grid product-single__thumbnails" id="ProductThumbs">
+            {% for image in product.images %}
+            <li class="grid__item">
+              <a data-image-id="{{ image.id }}" href="{{ image.src | img_url: '1024x1024' }}"
+                class="product-single__thumbnail">
+                <img src="{{ image.src | img_url: 'grande' }}" alt="{{ image.alt | escape }}">
+              </a>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+      {% endif %}
+
+    </div>
+    <div class="grid__item one-half product-main--contents">
+      <!-- <div class="grid__item product-main--contents"> -->
+      {% form 'product', product, class:productform_class %}
+      <div class="colored-wrap-info">
+        {% if section.settings.product_vendor_enable %}
+        <span class="h3" itemprop="brand">{{ product.vendor }}</span>
+        {% endif %}
+        <h1 itemprop="name" class="product_title">{{ product.title }}</h1>
+        <div itemprop="offers" itemscope itemtype="http://schema.org/Offer">
+          {% assign variant = product.selected_or_first_available_variant %}
+
+          <meta itemprop="priceCurrency" content="{{ shop.currency }}">
+          <link itemprop="availability"
+            href="http://schema.org/{% if product.available %}InStock{% else %}OutOfStock{% endif %}">
+
+
+
+          {%- if shop.taxes_included or shop.shipping_policy.body != blank -%}
+          <div
+            class="product-single__policies{% if product.has_only_default_variant and section.settings.product_quantity_enable == false %} product__policies--no-dropdowns{% endif %} rte">
+            {%- if shop.taxes_included -%}
+            {{ 'products.general.include_taxes' | t }}
+            {%- endif -%}
+            {%- if shop.shipping_policy.body != blank -%}
+            {{ 'products.general.shipping_policy_html' | t: link: shop.shipping_policy.url }}
+            {%- endif -%}
+          </div>
+          {%- endif -%}
+
+
+          {%comment%}
+          ==========================================================Custom
+          Code================================================================================
+          {%endcomment%}
+          <span class="call-to-action-text" id='productTitle'>{{product.title}}</span>
+          <p class="product-ratings">
+            <!--StartFragment--><strong><span class="Aq14fc" aria-hidden="true"
+                style="white-space: nowrap; font-family: Roboto, arial, sans-serif; font-size: 20px; letter-spacing: normal; margin-right: 5px;">4.8</span>
+              <g-review-stars
+                style="color: rgb(0, 0, 0); font-family: Roboto, arial, sans-serif; font-size: 20px; letter-spacing: normal;">
+                <span class="Fam1ne EBe2gf" aria-label="Rated 4.7 out of 5,"
+                  style="background-repeat: repeat-x; display: inline-block; overflow: hidden; position: relative; background-image: url(&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAANCAQAAAAz1Zf0AAAAWklEQVR4AY3O0QbDQBCG0UNYQi0hhBJqr8Iy7/94vewYlp65/Ay//4WlLnQLt3BbeIRH5jBFPVMHmlHS0CRnSqdiT3GH1edb8RGmoy4GwrBhM4Qmebn8XDrwBW7xChrojlOZAAAAAElFTkSuQmCC&quot;); background-size: 14px 13px; height: 13px; top: 1px; width: 69px;"><span
+                    style="background-repeat: repeat-x; display: block; background-image: url(&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAANCAYAAACZ3F9/AAAAZklEQVR4AWL4uYWZCdAJHVMBAIJAAG1DoAtjGarYxxjqwHADnA8HFuWL3E8puH8gAqILPaB34Qq4FAQ1yoo+8ES7NRWKe6u+Ogo0XjtaCmlSd6K/4OQQOF0JKYTsMasgOIRkBfDZATita/85jgoHAAAAAElFTkSuQmCC&quot;); background-size: 14px 13px; height: 13px; top: 1px; width: 63px;"></span></span>
+              </g-review-stars>
+              <font face="Roboto, arial, sans-serif"><span
+                  style="font-size: 14px; letter-spacing: normal; white-space: nowrap;">&nbsp;on Google</span></font>
+            </strong>
+          </p>
+
+          <div class="upload-info post-upload">
+            <span class="heading-title">Your Uploaded Image: </span>
+            <span id="filename"></span><span id='change-btn'>change</span>
+          </div>
+
+          <div id='customily-options-hider'>
+            {% include 'customily-options' %}
+            <div id='productPrice' class='pre-upload'>{{product.price | money}}</div>
+            <div class='post-upload'>
+              <div id='sizes'>
+                <div class="size-select-box">
+                  <div class="popular_sizes_div">
+                    <span class="size_text">10" x 20"</span>
+                    <span class="currency_symbol"></span><span class="option_price"></span><span
+                      class="option_compare_price"></span>
+                  </div>
+                </div>
+                <div class="size-select-box">
+                  <div class="popular_sizes_div">
+                    <span class="size_text">12" x 12"</span>
+                    <span class="currency_symbol"></span><span class="option_price"></span><span
+                      class="option_compare_price"></span>
+                  </div>
+                </div>
+                <div class="size-select-box">
+                  <div class="popular_sizes_div">
+                    <span class="size_text">12" x 18"</span>
+                    <span class="currency_symbol"></span><span class="option_price"></span><span
+                      class="option_compare_price"></span>
+                  </div>
+                </div>
+                <div class="size-select-box">
+                  <div class="popular_sizes_div">
+                    <span class="size_text">12" x 36"</span>
+                    <span class="currency_symbol"></span><span class="option_price"></span><span
+                      class="option_compare_price"></span>
+                  </div>
+                </div>
+                <div class="size-select-box">
+                  <div class="popular_sizes_div">
+                    <span class="size_text">14" x 11"</span>
+                    <span class="currency_symbol"></span><span class="option_price"></span><span
+                      class="option_compare_price"></span>
+                  </div>
+                </div>
+                <div class="size-select-box">
+                  <div class="popular_sizes_div">
+                    <span class="size_text">16" x 20"</span>
+                    <span class="currency_symbol"></span><span class="option_price"></span><span
+                      class="option_compare_price"></span>
+                  </div>
+                </div>
+                <div class="size-select-box">
+                  <div class="popular_sizes_div">
+                    <span class="size_text">18" x 12"</span>
+                    <span class="currency_symbol"></span><span class="option_price"></span><span
+                      class="option_compare_price"></span>
+                  </div>
+                </div>
+                <div class="size-select-box">
+                  <div class="popular_sizes_div">
+                    <span class="size_text">20" x 16"</span>
+                    <span class="currency_symbol"></span><span class="option_price"></span><span
+                      class="option_compare_price"></span>
+                  </div>
+                </div>
+                <div class="size-select-box">
+                  <div class="popular_sizes_div">
+                    <span class="size_text">20" x 30"</span>
+                    <span class="currency_symbol"></span><span class="option_price"></span><span
+                      class="option_compare_price"></span>
+                  </div>
+                </div>
+                <div class="size-select-box">
+                  <div class="popular_sizes_div">
+                    <span class="size_text">24" x 36"</span>
+                    <span class="currency_symbol"></span><span class="option_price"></span><span
+                      class="option_compare_price"></span>
+                  </div>
+                </div>
+                <div class="size-select-box">
+                  <div class="popular_sizes_div">
+                    <span class="size_text">30" x 20"</span>
+                    <span class="currency_symbol"></span><span class="option_price"></span><span
+                      class="option_compare_price"></span>
+                  </div>
+                </div>
+                <div class="size-select-box">
+                  <div class="popular_sizes_div">
+                    <span class="size_text">36" x 12"</span>
+                    <span class="currency_symbol"></span><span class="option_price"></span><span
+                      class="option_compare_price"></span>
+                  </div>
+                </div>
+                <div class="size-select-box">
+                  <div class="popular_sizes_div">
+                    <span class="size_text">36" x 24"</span>
+                    <span class="currency_symbol"></span><span class="option_price"></span><span
+                      class="option_compare_price"></span>
+                  </div>
+                </div>
+              </div>
+              <select name="id" id="ProductSelect-{{ section.id }}" class="product-single__variants">
+                {% for variant in product.variants %}
+                {% if variant.available %}
+                <option class="hidden_sel" {% if variant==product.selected_or_first_available_variant %} {% endif %}
+                  data-sku="{{ variant.sku }}" value="{{ variant.id }}">{{ variant.title }} - {{ variant.price |
+                  money_with_currency }}</option>
+                {% else %}
+                <option disabled="disabled">{{ variant.title }} - {{ 'products.product.sold_out' | t }}</option>
+                {% endif %}
+                {% endfor %}
+              </select>
+              
+              <div class="display_options options-card"></div>
+              	
+              <div
+                class="productsingle__prices{% if shop.taxes_included or shop.shipping_policy.body != blank %} product-single__prices--policy-enabled{% endif %}">
+                <span id="PriceA11y" class="visually-hidden">{{ 'products.product.regular_price' | t }}</span>
+                {%- capture wsprice -%}{% include 'ws-item-price', item: product, money: false %}{%- endcapture -%}{%-
+                assign wsprice = wsprice | plus: 0 -%}
+
+              </div>
+              <p id='confirmation_text'>By submitting my order, I accept that my Metal Print will be printed exactly as
+                shown on this page.</p>
+              <div id="loadingButton" class='is_hidden'>
+                <p id="loadingButtonContent">Processing Image, this could take a second</p>
+              </div>
+              <div id='atcwrapper'>
+                <button type="button" name="insertUpcharge" id="insertUpcharge" class="btn">
+                    <span>Add to Cart</span>
+                  </button>
+                <button type="submit" name="add" id="AddToCart"
+                  class=" btn {{ btn_class }}{% if section.settings.enable_payment_button %} btn--secondary{% endif %}">
+                  <span>Add to Cart</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <div class='pre-upload' id="product-description">
+          {{ product.description }}
+          <ul>
+            <li>
+              <p><i class="gf_icon fa fa-flag fa-1x"></i> &nbsp; 100% Made In America</p>
+            </li>
+            <li>
+              <p><i class="gf_icon fa fa-plane fa-1x"></i> &nbsp; Next Day Shipping Available</p>
+            </li>
+            <li>
+              <p><i class="gf_icon fa fa-money fa-1x"></i> &nbsp; 100% Money Back Guarantee</p>
+            </li>
+            <li>
+              <p><i class="gf_icon fa fa-tag" fa-1x=""></i> &nbsp; Use Shopify Pay to break the price down into 4 easy
+                payments!
+              </p>
+            </li>
+          </ul>
+
+        </div>
+      </div>
+
+      <div id='customUploadBtn' class='pre-upload'>Upload Your Image</div>
+
+      {% render "payment-icons" %}
+
+
+      <input type="radio" id="low_DPI_option" name="properties[_dpiChecker]" type="text" value="No img uploaded"
+        style="display:none;">
+      {% unless wholesaler %}{% if section.settings.enable_payment_button %}
+      {{ form | payment_button }}
+      {% endif %}{% endunless %}
+
+      {% endform %}
+      <p id='order'></p>
+
+
+      {% render 'banana-stand-product-page-container' %}
+      {% unless section.settings.show_extra_tab == false or pages[section.settings.extra_tab_content] == empty %}
+      <div class="tabs">
+        <ul class="tab-switch__nav">
+          <li><a href="#description" data-link="description" class="tab-switch__trigger h3">{{
+              'products.product.description' | t }}</a></li>
+          <li><a href="#extra" data-link="extra" class="tab-switch__trigger h3">{{
+              pages[section.settings.extra_tab_content].title }}</a></li>
+        </ul>
+
+        <div id="extra" class="tab-switch__content" data-content="extra">
+          <div class="rte">{{ pages[section.settings.extra_tab_content].content }}</div>
+        </div>
+      </div>
+      {% endunless %}
+
+      {% if section.settings.social_sharing %}
+      <hr class="hr--clear hr--small">
+      <h2 class="h4">{{ 'products.general.share_title' | t }}</h2>
+      {% include 'social-sharing' %}
+      {% endif %}
+    </div>
+  </div>
+
+
+
+  <div class="product-single__quantity{% unless section.settings.product_quantity_enable %} is-hidden{% endunless %}">
+    <label for="Quantity">{{ 'products.product.quantity' | t }}</label>
+    <input type="number" id="Quantity" name="quantity" value="1" min="1" class="quantity-selector">
+  </div>
+  <label id="dpi_label" for="dpi_checkbox" style="display: none;">I understand with a low resolution image my
+    print might appear differently than expected</label>
+  <input id="dpi_checkbox" type="checkbox" name="dpi_checkbox" style="display: none"><br>
+
+</div>
+<!-- End grid product-single__hero -->
+</div>
+</div>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+{% include 'acrylic_scripts' %}
+
+
+{% unless product == empty %}
+<script type="application/json" id="ProductJson-{{ section.id }}">
+    {{ product | json }}
+  </script>
+{% include 'ws-product-script' %}
+{% endunless %}
+
+<!-- custom product option app-->
+{% if customer %}
+<script>
+   //-------Start code for displaying custom options on product template ---------------
+   $( document ).ready(function() {
+    var product_id = {{ product.id }};
+    var customer_id = {{ customer.id }};
+    //alert(product_id);
+    console.log( "ready!" );
+    $.ajax({
+     url: 'https://137.184.223.104/getCustomerOptions.php',
+      data: {product_id: product_id, customer_id: customer_id},
+      type:'POST',
+      dataType: "json",
+     success: function (data) {
+       	//alert(data.html);
+       $(".display_options").hide();
+      // checkNDS();
+       $(".display_options").append(data.html);
+       checkNDS();
+       setTimeout(function() {
+         $(".display_options").show();
+         }, 1000);
+     }
+   });
+    
+    var y = $(".product__price").text();
+       //alert(y);
+});
+</script>
+{% else %}
+<script>
+   //-------Start code for displaying custom options on product template ---------------
+   $( document ).ready(function() {
+    var product_id = {{ product.id }};
+    //alert(product_id);
+    console.log( "ready!" );
+    $.ajax({
+     url: 'https://137.184.223.104/getProductOptions.php',
+      data: {product_id: product_id},
+      type:'POST',
+      dataType: "json",
+     success: function (data) {
+       	//alert(data.html);
+       $(".display_options").hide();
+      // checkNDS();
+       $(".display_options").append(data.html);
+       checkNDS();
+       setTimeout(function() {
+         $(".display_options").show();
+         }, 1000);
+     }
+   });
+    
+    var y = $(".product__price").text();
+       //alert(y);
+     
+     
+});
+</script>
+{% endif %}
+
+<script>
+  
+  function checkNDS(){
+    
+    //alert('here');
+   $.ajax({
+        type: 'GET',
+        url: '/cart.js',
+        cache: false,
+        dataType: 'json',
+        success: function(cart) {
+       let items = cart.items;
+        for(var i=0; i < items.length; i++){
+        //alert(items[i].id);
+          //if(items[i].id == 41364848017589)
+          if(items[i].product_title == 'NEXT DAY SHIPPING')
+          {
+              document.getElementById('next-day-shipping').style.display = 'none';
+            document.getElementById('digital-proof').style.display = 'none';
+        }
+        }
+        }
+    });
+  }
+</script>
+  
+    <!------End code for displaying custom options on product template ---------------
+  //-------Start code for hidding next digital proof /NDS --------------->
+<script>
+ $(document).on('click','.next-day-shipping-yes',function(){
+   //alert("next");
+   document.getElementById('digital-proof').style.display = 'none';
+});
+   $(document).on('click','.next-day-shipping-no',function(){
+   document.getElementById('digital-proof').style.display = 'flex';
+});
+  // hide and show NDS is when digital proof is selected
+   $(document).on('click','.digital-proof-yes',function(){
+   document.getElementById('next-day-shipping').style.display = 'none';
+});
+     $(document).on('click','.digital-proof-no',function(){
+   document.getElementById('next-day-shipping').style.display = 'flex';
+});
+
+//-----------------------End---------------------------------------------
+</script>

@@ -1,0 +1,70 @@
+{% comment %}
+	GEMPAGE BUILDER (https://apps.shopify.com/gempage)
+
+	You SHOULD NOT modify source code in this page because
+	It is automatically generated from GEMPAGE BUILDER
+	Try to edit page with the live editor.
+{% endcomment %}
+<!--GEM_HEADER-->
+<link data-instant-track rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" class="gf-style" />
+<link data-instant-track rel="stylesheet" type="text/css" href="https://d1um8515vdn9kb.cloudfront.net/files/vendor.css?refresh=1" class="gf-style" />
+<link data-instant-track rel="stylesheet" type="text/css" href="{{ 'gem-page-product-1595598221.css' | asset_url }}" class="gf_page_style">
+<!--GEM_HEADER_END-->
+<div class="wrapper">
+  <div class="grid">
+    <div class="grid__item">
+    {% section 'product-template' %}
+    </div>
+  </div>
+</div>{% section 'product-guarantee' %}<div class="wrapper">
+  <div class="grid">
+    <div class="grid__item">
+    {% section 'product-recommendations' %}
+    </div>
+  </div></div><!-- Canonical -->
+<link rel="canonical" href="{{ canonical_url }}" /><script src="https://widget.reviews.io/rich-snippet/dist.js"></script>
+<script>
+richSnippet({
+    store: 'canvasprints.com',
+    sku: '{{ product.variants | map: "sku" | join: ";" }};{{ product.variants | map: "id" | join: ";" }}',
+  
+  data: {
+                   category: {{ product.type | json }},
+                   gtin12:"{{product.variants.first.barcode}}",
+                  url: "{{ shop.url }}{{ product.url }}",
+                  {%- if product.featured_image -%}
+                  		image: 'https:{{ product.featured_image | product_img_url: 'grande' }}',
+                  {%- endif -%}
+                  {% if variant.image %}
+                  {% assign variant_image_size = variant.image.width | append: 'x' %}
+                        image: "http:{{ variant.image.src | img_url: variant_image_size }}",
+                  {% endif %}
+                  
+                  description: "{{ product.description | strip_html | strip_newlines | escape }}",
+                  offers: [{
+            		  type: 'Offer',
+                      price: "{{ product.selected_or_first_available_variant.price | money_without_currency | replace : ',', '' }}",
+                      priceCurrency: "{{ shop.currency }}",
+                      url: "{{ shop.url }}{{ product.url }}",
+                      availability: "http://schema.org/{% if product.available %}InStock{% else %}OutOfStock{% endif %}",
+                      priceValidUntil: "{{ "now" | date: "%s" | plus: 2592000 | date: "%Y-%m-%-d" }}",
+                  }],
+                  brand: {
+                    type: 'Brand',
+                    name: '{{ product.vendor | escape }}',
+                  },
+              }});
+</script><!-- Please Keep For SEO Purposes -->
+<link rel="canonical" href="{{ canonical_url }}" />
+<!--GEM_FOOTER-->
+{% capture GEM_FOOTER_SCRIPT %}
+<script data-instant-track type="text/javascript">
+if(typeof pageLibs === 'undefined' || pageLibs === null){	var pageLibs = [		'{{ 'gem-page-product-1595598221.js' | asset_url }}',	];
+}
+</script>
+<script data-instant-track type="text/javascript" src="https://www.youtube.com/player_api" class="gf-script" defer="defer"></script>
+<script data-instant-track type="text/javascript">
+	var GEMVENDOR = GEMVENDOR || (function(){		var _js = {};		return {			init: function(Args) {				_js = Args;			},			getLibs: function() {				return _js;			}		};	}());	GEMVENDOR.init(pageLibs);</script>
+<script data-instant-track type="text/javascript" src="https://d1um8515vdn9kb.cloudfront.net/files/gempagev1.js?v=1.0" class="gf-script" defer></script>
+{% endcapture %}
+<!--GEM_FOOTER_END-->

@@ -1,0 +1,7 @@
+{% include 'customily-conditions' %}
+{% if settings.customily_enabled and customily_show %}
+      <div class="canvas-wrapper" style="display:none">
+        <canvas id="preview-canvas"></canvas>
+        
+      </div>
+{% endif %}

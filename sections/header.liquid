@@ -1,0 +1,632 @@
+<style>
+  #cart_button {
+    font-size: 1.2em;
+  }
+
+    {
+    %- assign logo_width=695 -%
+  }
+
+    {
+    %- assign logo_max_width=section.settings.logo_max_width | times: 1 -%
+  }
+
+    {
+    % if logo_max_width < logo_width %
+  }
+
+    {
+    %- assign logo_width=logo_max_width -%
+  }
+
+    {
+    % endif %
+  }
+
+  .logo__image-wrapper {
+    max-width: {
+        {
+        logo_width
+      }
+    }
+
+    px;
+  }
+
+  /*================= If logo is above navigation ================== */
+    {
+    % if section.settings.nav_below_logo %
+  }
+
+  .site-nav {
+      {
+      % if section.settings.show_header_lines %
+    }
+
+    border-top: 1px solid {
+        {
+        settings.color_borders
+      }
+    }
+
+    ;
+
+    border-bottom: 1px solid {
+        {
+        settings.color_borders
+      }
+    }
+
+    ;
+
+      {
+      % endif %
+    }
+
+    margin-top: 30px;
+  }
+
+    {
+    % unless section.settings.left_aligned_logo %
+  }
+
+  .logo__image-wrapper {
+    margin: 0 auto;
+  }
+
+    {
+    % endunless %
+  }
+
+    {
+    % endif %
+  }
+
+  /*============ If logo is on the same line as navigation ============ */
+    {
+    % unless section.settings.nav_below_logo or section.settings.show_header_lines==false %
+  }
+
+  .site-header .grid--full {
+    border-bottom: 1px solid {
+        {
+        settings.color_borders
+      }
+    }
+
+    ;
+    padding-bottom: 30px;
+  }
+
+    {
+    % endunless %
+  }
+
+
+    {
+    % unless section.settings.nav_below_logo %
+  }
+
+  @media screen and (min-width: 769px) {
+    .site-nav {
+      text-align: right !important;
+    }
+  }
+
+    {
+    % endunless %
+  }
+</style>
+
+<div data-section-id="{{ section.id }}" data-section-type="header-section">
+  <div class="header-bar">
+    <div class="wrapper medium-down--hide">
+      <div class="post-large--display-table">
+
+        {% if section.settings.show_announcement or section.settings.header_search_enable %}
+        <div class="header-bar__left post-large--display-table-cell">
+
+          {% comment %}
+          Add social links to header
+          {% endcomment %}
+
+          {% comment %}
+          <div class="header-bar__module header-bar__module--list">
+            {% include 'social-links' %}
+          </div>
+          {% endcomment %}
+
+          {% if section.settings.show_announcement %}
+          <div class="header-bar__module header-bar__message">
+            {% if section.settings.announcement_link != blank %}
+            <a href="{{ section.settings.announcement_link }}">
+              {% endif %}
+              {{ section.settings.header_text | escape }}
+              {% if section.settings.announcement_link != blank %}
+            </a>
+            {% endif %}
+          </div>
+          {% elsif section.settings.header_search_enable %}
+          <div class="header-bar__module header-bar__search">
+            {% include 'search-bar' with 'header' %}
+          </div>
+          {% endif %}
+
+        </div>
+        {% endif %}
+
+        <div class="header-bar__right post-large--display-table-cell">
+
+          {% if shop.customer_accounts_enabled %}
+          <ul class="header-bar__module header-bar__module--list">
+            {% if customer %}
+            <li>
+              <a href="/account">{{ 'layout.customer.account' | t }}</a>
+            </li>
+            <li>
+              {{ 'layout.customer.log_out' | t | customer_logout_link }}
+            </li>
+            {% else %}
+            <li>
+              {{ 'layout.customer.log_in' | t | customer_login_link }}
+            </li>
+            <li>{{ 'layout.customer.or' | t }}</li>
+            <li>
+              {{ 'layout.customer.create_account' | t | customer_register_link }}
+            </li>
+            {% endif %}
+          </ul>
+          {% endif %}
+
+          <div class="header-bar__module">
+            <span class="header-bar__sep" aria-hidden="true"></span>
+            <a id='cart_button' href="/cart" class="cart-page-link">
+              <span class="icon icon-cart header-bar__cart-icon" aria-hidden="true"></span>
+            </a>
+          </div>
+
+          <div class="header-bar__module">
+            <a id='cart_button' href="/cart" class="cart-page-link">
+              {{ 'layout.cart.title' | t }}{% unless cart.item_count == 0 %}:{% endunless %}
+              <span class="cart-count header-bar__cart-count{% if cart.item_count == 0 %} hidden-count{% endif %}">{{
+                cart.item_count }}</span>
+            </a>
+          </div>
+
+          <div class="header-bar__module">
+            <span class="header-bar__sep" aria-hidden="true"></span>
+            <a href="tel:8552268279">855-226-8279
+            </a>
+          </div>
+
+          {% if section.settings.header_search_enable %}
+          {% if section.settings.show_announcement %}
+          <div class="header-bar__module header-bar__search">
+            {% include 'search-bar' with 'header' %}
+          </div>
+          {% endif %}
+          {% endif %}
+
+        </div>
+      </div>
+    </div>
+
+    <div class="wrapper post-large--hide announcement-bar--mobile">
+      {% if section.settings.show_announcement %}
+      {% if section.settings.announcement_link != blank %}
+      <a href="{{ section.settings.announcement_link }}">
+        {% endif %}
+        <span>{{ section.settings.header_text | escape }}</span>
+        {% if section.settings.announcement_link != blank %}
+      </a>
+      {% endif %}
+      {% endif %}
+    </div>
+
+    <div class="wrapper post-large--hide">
+      {% unless section.settings.nav_menu == blank and section.settings.header_search_enable == false and
+      shop.customer_accounts_enabled == false %}
+      <button type="button" class="mobile-nav-trigger" id="MobileNavTrigger" aria-controls="MobileNav"
+        aria-expanded="false">
+        <span class="icon icon-hamburger" aria-hidden="true"></span>
+        {{ 'layout.navigation.menu' | t }}
+      </button>
+      {% endunless %}
+      <a id='cart_button' href="/cart" class="cart-page-link mobile-cart-page-link">
+        <span class="icon icon-cart header-bar__cart-icon" aria-hidden="true"></span>
+        {{ 'layout.cart.title' | t }} <span class="cart-count{% if cart.item_count == 0 %} hidden-count{% endif %}">{{
+          cart.item_count }}</span>
+      </a>
+
+      <a href="tel:8552268279" class="cart-page-link mobile-cart-page-link">
+        <i class="fas fa-phone-alt fa-sm">&nbsp;&nbsp;</i></a>
+    </div>
+    {% include 'mobile-nav' with linklists[section.settings.nav_menu] %}
+  </div>
+
+  <header class="site-header" role="banner">
+    <div class="wrapper">
+
+      {% if section.settings.nav_below_logo %}
+      <div class="grid--full">
+        <div class="grid__item">
+          {% if template.name == 'index' %}
+          <h2
+            class="site-header__logo{% if section.settings.logo == blank %}{% unless section.settings.left_aligned_logo == false and section.settings.nav_below_logo %} post-large--left{% endunless %}{% endif %}">
+            {% else %}
+            <div
+              class="h1 site-header__logo{% if section.settings.logo == blank %}{% unless section.settings.left_aligned_logo == false and section.settings.nav_below_logo %} post-large--left{% endunless %}{% endif %}">
+              {% endif %}
+              {% if section.settings.logo != blank %}
+              <noscript>
+                {% capture image_size %}{{ logo_width | escape }}x{% endcapture %}
+                <div class="logo__image-wrapper">
+                  {{ section.settings.logo | img_url: image_size | img_tag: shop.name }}
+                </div>
+              </noscript>
+              <div class="logo__image-wrapper supports-js">
+                <a href="/" itemprop="url"
+                  style="padding-top:{{ 1 | divided_by: section.settings.logo.aspect_ratio | times: 100}}%;">
+                  {% assign img_url = section.settings.logo | img_url: '1x1' | replace: '_1x1.', '_{width}x.' %}
+                  <img class="logo__image lazyload" src="{{ section.settings.logo | img_url: '800x800' }}"
+                    data-src="{{ img_url }}"
+                    data-widths="[120, 180, 360, 540, 720, 900, 1080, 1296, 1512, 1728, 1944, 2048]"
+                    data-aspectratio="{{ section.settings.logo.aspect_ratio }}" data-sizes="auto"
+                    alt="{{ shop.name | escape }}" itemprop="logo">
+                </a>
+              </div>
+              {% else %}
+              <a href="/" itemprop="url">{{ shop.name }}</a>
+              {% endif %}
+              {% if template.name == 'index' %}
+          </h2>
+          {% else %}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    <div class="grid--full medium-down--hide">
+      <div class="grid__item">
+        {% include 'site-nav' with linklists[section.settings.nav_menu] %}
+      </div>
+    </div>
+    {% else %}
+    <div class="grid--full post-large--display-table">
+      <div class="grid__item post-large--one-third post-large--display-table-cell">
+        {% if template.name == 'index' %}
+        <h2
+          class="site-header__logo{% if section.settings.logo == blank %}{% unless section.settings.left_aligned_logo == false and section.settings.nav_below_logo %} post-large--left{% endunless %}{% endif %}">
+          {% else %}
+          <div
+            class="h1 site-header__logo{% if section.settings.logo == blank %}{% unless section.settings.left_aligned_logo == false and section.settings.nav_below_logo %} post-large--left{% endunless %}{% endif %}">
+            {% endif %}
+            {% if section.settings.logo != blank %}
+            <noscript>
+              {% capture image_size %}{{ logo_width | escape }}x{% endcapture %}
+              <div class="logo__image-wrapper">
+                {{ section.settings.logo | img_url: image_size | img_tag: shop.name }}
+              </div>
+            </noscript>
+            <div class="logo__image-wrapper supports-js">
+              <a href="/" itemprop="url"
+                style="padding-top:{{ 1 | divided_by: section.settings.logo.aspect_ratio | times: 100}}%;">
+                {% assign img_url = section.settings.logo | img_url: '1x1' | replace: '_1x1.', '_{width}x.' %}
+                <img class="logo__image lazyload" src="{{ section.settings.logo | img_url: '800x800' }}"
+                  data-src="{{ img_url }}"
+                  data-widths="[120, 180, 360, 540, 720, 900, 1080, 1296, 1512, 1728, 1944, 2048]"
+                  data-aspectratio="{{ section.settings.logo.aspect_ratio }}" data-sizes="auto"
+                  alt="{{ shop.name | escape }}" itemprop="logo">
+              </a>
+            </div>
+            {% else %}
+            <a href="/" itemprop="url">{{ shop.name }}</a>
+            {% endif %}
+            {% if template.name == 'index' %}
+        </h2>
+        {% else %}
+      </div>
+      {% endif %}
+    </div>
+    <div class="grid__item post-large--two-thirds post-large--display-table-cell medium-down--hide">
+      {% include 'site-nav' with linklists[section.settings.nav_menu] %}
+    </div>
+</div>
+{% endif %}
+
+</div>
+</header>
+</div>
+<style>
+  @media (min-width:992px) and (max-width: 1199px) {
+    footer.site-footer .grid-uniform .post-large--one-quarter {
+      padding-left: 10px !important;
+    }
+  }
+
+  @media (min-width:769px) and (max-width: 991px) {
+    footer.site-footer .grid-uniform .post-large--one-quarter {
+      padding-left: 10px !important;
+    }
+
+    footer.site-footer .grid-uniform .post-large--one-quarter:nth-child(3) {
+      width: 18%;
+    }
+
+    footer.site-footer .grid-uniform .post-large--one-quarter:nth-child(4) {
+      width: 32%;
+    }
+  }
+
+  @media screen and (min-width: 768px) {
+
+    div#shopify-section-header {
+      padding-bottom: 20px;
+    }
+  }
+
+  @media (max-width:767px) {
+
+    header.site-header {
+      padding: 0px 2px 0px !important;
+    }
+  }
+</style>
+
+{% schema %}
+{
+"name": {
+"de": "Titel",
+"en": "Header",
+"es": "Encabezado",
+"fr": "En-tête",
+"it": "Header",
+"ja": "ヘッダー",
+"nl": "Koptekst",
+"pt-BR": "Cabeçalho",
+"zh-CN": "标头",
+"zh-TW": "標頭"
+},
+"settings": [
+{
+"type": "checkbox",
+"id": "header_search_enable",
+"label": {
+"de": "Suchleiste anzeigen",
+"en": "Show search bar",
+"es": "Mostrar barra de búsqueda",
+"fr": "Afficher la barre de recherche",
+"it": "Mostra barra di ricerca",
+"ja": "検索バーを表示する",
+"nl": "Zoekbalk weergeven",
+"pt-BR": "Exibir barra de pesquisa",
+"zh-CN": "显示搜索栏",
+"zh-TW": "顯示搜尋列"
+}
+},
+{
+"type": "image_picker",
+"id": "logo",
+"label": {
+"de": "Logo",
+"en": "Logo",
+"es": "Logotipo",
+"fr": "Logo",
+"it": "Logo",
+"ja": "ロゴ",
+"nl": "Logo",
+"pt-BR": "Logotipo",
+"zh-CN": "logo",
+"zh-TW": "商標"
+},
+"info": {
+"de": "450 x 200 Pixel empfohlen",
+"en": "450 x 200px recommended",
+"es": "450 x 200px recomendado",
+"fr": "450 x 200 px recommandé",
+"it": "450 x 200 px consigliato",
+"ja": "450 x 200ピクセルを推奨",
+"nl": "450 x 200 px aanbevolen",
+"pt-BR": "450 x 200 px recomendado",
+"zh-CN": "推荐使用 450 x 200 像素大小",
+"zh-TW": "建議使用 450 x 200px"
+}
+},
+{
+"type": "text",
+"id": "logo_max_width",
+"label": {
+"de": "Benutzerdefinierte Logobreite (Pixel)",
+"en": "Custom logo width (in pixels)",
+"es": "Ancho del logotipo personalizado (en píxeles)",
+"fr": "Largeur personnalisée du logo (en pixels)",
+"it": "Larghezza logo personalizzato (in pixel)",
+"ja": "ロゴの幅をカスタムする（ピクセルで）",
+"nl": "Aangepaste logobreedte (in pixels)",
+"pt-BR": "Largura do logotipo personalizado (em pixels)",
+"zh-CN": "自定义 logo 宽度（像素）",
+"zh-TW": "自訂標誌寬度 (單位為像素)"
+},
+"default": {
+"de": "450",
+"en": "450",
+"es": "450",
+"fr": "450",
+"it": "450",
+"ja": "450",
+"nl": "450",
+"pt-BR": "450",
+"zh-CN": "450",
+"zh-TW": "450"
+}
+},
+{
+"type": "header",
+"content": {
+"de": "Hauptmenü",
+"en": "Main menu",
+"es": "Menú principal",
+"fr": "Menu principal",
+"it": "Menu principale",
+"ja": "メインメニュー",
+"nl": "Hoofdmenu",
+"pt-BR": "Menu principal",
+"zh-CN": "主菜单",
+"zh-TW": "主選單"
+}
+},
+{
+"type": "link_list",
+"id": "nav_menu",
+"label": {
+"de": "Menü",
+"en": "Menu",
+"es": "Menú",
+"fr": "Menu",
+"it": "Menu",
+"ja": "メニュー",
+"nl": "Menu",
+"pt-BR": "Menu",
+"zh-CN": "菜单",
+"zh-TW": "選單"
+},
+"default": "main-menu"
+},
+{
+"type": "checkbox",
+"id": "nav_below_logo",
+"label": {
+"de": "Hauptmenü unter Logo zentrieren",
+"en": "Center main menu below logo",
+"es": "Centrar el menú principal debajo del logotipo",
+"fr": "Centrer le menu principal sous le logo",
+"it": "Centra menu principale sotto il logo",
+"ja": "ロゴの下のメインメニューを中央寄せする",
+"nl": "Centreer hoofdmenu onder logo",
+"pt-BR": "Centralizar menu principal abaixo do logotipo",
+"zh-CN": "在 logo 下方居中显示主菜单",
+"zh-TW": "將主選單置中並置於商標下方"
+}
+},
+{
+"type": "checkbox",
+"id": "left_aligned_logo",
+"label": {
+"de": "Logo linksbündig ausrichten",
+"en": "Left-align logo",
+"es": "Alinear el logotipo a la izquierda",
+"fr": "Aligner le logo à gauche",
+"it": "Allinea logo a sinistra",
+"ja": "ロゴを左寄せする",
+"nl": "Logo links uitlijnen",
+"pt-BR": "Alinhar logotipo à esquerda",
+"zh-CN": "左对齐 logo",
+"zh-TW": "將商標靠左對齊"
+}
+},
+{
+"type": "checkbox",
+"id": "show_header_lines",
+"label": {
+"de": "Trennlinien in Header anzeigen",
+"en": "Show divider lines in header",
+"es": "Mostrar líneas divisorias en el encabezado",
+"fr": "Afficher les lignes de séparation dans l'en-tête",
+"it": "Mostra linee divisorie nell'header",
+"ja": "ヘッダーに分割線を表示する",
+"nl": "Toon scheidingslijnen in koptekst",
+"pt-BR": "Exibir linhas divisórias no cabeçalho",
+"zh-CN": "在标头中显示分割线",
+"zh-TW": "在標頭中顯示分隔線"
+}
+},
+{
+"type": "header",
+"content": {
+"de": "Ankündigungsbereich",
+"en": "Announcement bar",
+"es": "Barra de anuncios",
+"fr": "Barre d'annonces",
+"it": "Barra degli annunci",
+"ja": "告知バー",
+"nl": "Aankondigingsbalk",
+"pt-BR": "Barra de anúncios",
+"zh-CN": "公告栏",
+"zh-TW": "公告列"
+}
+},
+{
+"type": "checkbox",
+"id": "show_announcement",
+"label": {
+"de": "Ankündigung anzeigen",
+"en": "Show announcement",
+"es": "Mostrar anuncio",
+"fr": "Afficher l'annonce",
+"it": "Mostra annuncio",
+"ja": "告知を表示する",
+"nl": "Aankondiging weergeven",
+"pt-BR": "Exibir anúncio",
+"zh-CN": "显示公告",
+"zh-TW": "顯示公告"
+},
+"default": true
+},
+{
+"type": "text",
+"id": "header_text",
+"label": {
+"de": "Text",
+"en": "Text",
+"es": "Texto",
+"fr": "Texte",
+"it": "Testo",
+"ja": "テキスト",
+"nl": "Tekst",
+"pt-BR": "Texto",
+"zh-CN": "文本",
+"zh-TW": "文字"
+},
+"default": {
+"de": "Hier etwas ankündigen",
+"en": "Announce something here",
+"es": "Anuncia algo aquí",
+"fr": "Annoncez quelque chose ici",
+"it": "Annuncia qualcosa qui",
+"ja": "ここで告知してください",
+"nl": "Kondig hier iets aan",
+"pt-BR": "Anuncie algo aqui",
+"zh-CN": "在此处进行公告",
+"zh-TW": "在此公告資訊"
+}
+},
+{
+"type": "url",
+"id": "announcement_link",
+"label": {
+"de": "Link",
+"en": "Link",
+"es": "Enlace",
+"fr": "Lien",
+"it": "Link",
+"ja": "リンク",
+"nl": "Link",
+"pt-BR": "Link",
+"zh-CN": "链接",
+"zh-TW": "連結"
+},
+"info": {
+"de": "Optional",
+"en": "Optional",
+"es": "Opcional",
+"fr": "Facultatif",
+"it": "Facoltativo",
+"ja": "選択させる",
+"nl": "Optioneel",
+"pt-BR": "Opcional",
+"zh-CN": "可选",
+"zh-TW": "(選填)"
+}
+}
+]
+}
+{% endschema %}

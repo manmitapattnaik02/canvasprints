@@ -1,0 +1,291 @@
+<script>
+var baseImage
+var baseSplitImage1
+var baseSplitImage2
+var baseSplitImage3
+var changeSizeCalled = false
+
+
+$(document).ready(function(){
+  
+  document.getElementById('hidden_prop_1').value = 'stand-in-value'	//This is to fix an issue where wall-displays with no options are not created on Trello
+  document.getElementById('hidden_prop_2').value = 'stand-in-value'	//This is to fix an issue where wall-displays with no options are not created on Trello
+  
+  $('.product-main--contents .product-single__photos').addClass('photo_loaded')  //Makes canvas visible on mobile
+  $('#sizes').val(window.location.pathname.split('/').pop()) //Sets size selector to current product
+  
+  
+  $('#imginput').on('change', function(e){
+    uploadTriptych(e, 'standard')
+    $('.product-single__image-wrapper').hide()
+    $('.canvas-wrapper').show()
+    $('body .product-single__photos').addClass('is_loading')
+    $('.triptych-mover').hide()
+    $('#sizes').prop('disabled', true)
+    $('.lockable').addClass('button_lockout')
+    $('#hulkappsWrapper').css('display','block')
+    $('#selector-wrapper').show()
+    $('#confirmation_text').show()
+    $('#atcwrapper').css('display','block')
+    $('#changephotobtn').show()
+    $('#imguploadwrapper').hide()
+  })
+
+  $('#atcwrapper').click(function(){
+    console.log('atcwrapper clicked')
+    $('#loadingButton').removeClass('is_hidden')
+    $('#atcwrapper').hide()
+    var button = document.querySelector('#loadingButton');
+    var content = document.querySelector('#loadingButtonContent');
+    setTimeout(function(){
+      content.textContent = 'Processing Image'
+      var counter = 0;
+      var loadingDotInterval = setInterval(function(){
+        if (counter == 30){
+          console.log('adding newline')
+          content.textContent = content.textContent + '\n'
+        }
+        if( counter > 48){
+          clearInterval(loadingDotInterval)
+        }
+        counter ++
+        if (counter < 30){
+          content.textContent = 'Processing Image' + '.'.repeat(counter)
+        }else{
+          content.textContent = 'Processing Image...................................\n' + '.'.repeat(counter-30)
+        }
+      }, 2000)
+    }, 5000)
+  })
+  
+  $('#sizes').on('change', function(){
+    $('body .product-single__photos').addClass('is_loading')
+    $('.triptych-mover').hide()
+    $('#sizes').prop('disabled', true)
+    $('.lockable').addClass('button_lockout')
+    changeSize($('#sizes').val())
+    changeInfo($('#sizes').val())
+  })
+  
+  
+  $('#customuploadbtn').on('click', function(){
+    $('#imginput').click()
+  })
+  
+  
+  $('#changephotobtn').on('click', function(){
+    $('#imginput').click()
+  })
+})
+
+
+
+function moveimg(direction){
+  var distance
+  if ($("#productTitle").text().includes("Flow")){	//Done because 'flow' triptychs include image placeholder masks which make movements smaller
+    distance = 40
+  }else{
+    distance = 20
+  }
+  switch(direction){
+    case "left":
+      var x = -1 * distance
+      var y = 0
+      break
+    case "right":
+      var x = distance
+      var y = 0
+      break
+    case "up":
+      var x = 0
+      var y = -1 * distance
+      break
+    case "down":
+      var x = 0
+      var y = distance
+      break
+  }
+  engraver.canvas.getObjects().filter(o => o.type === 'image-placeholder').forEach(obj => {
+    var params = obj.getEditModeImageParameters()
+    obj.setEditModeImageOffset(params.offsetX + x, params.offsetY + y)
+  })
+  engraver.canvas.renderAll()
+}
+  
+  
+  
+function uploadTriptych(e, type){
+  if(engraver.canvas != undefined){
+    if(engraver.canvas.getObjects()[2] != undefined){
+      if(engraver.canvas.getObjects()[2].imageName != undefined){
+        var previousImageName = engraver.canvas.getObjects()[2].imageName	//Stores last image name so I can check to make sure it has been changed before removing loading circle
+      }else{
+        var previousImageName = ''
+      }
+    }else{
+      var previousImageName = ''
+    }
+  }
+  var regex = /([0-9])+/gm
+  var allCanvasDimensions = $("#sizes option:selected").text().match(regex)
+  var allCanvasHeight = allCanvasDimensions[0]
+  var allCanvasWidth = allCanvasDimensions[1]
+  if (type == 'standard'){
+    var imageFile = e.target.files[0]
+    var reader = new FileReader()
+    reader.readAsDataURL(imageFile)
+    reader.onload = function(){
+      baseImage = reader.result
+      var canvas = document.createElement('canvas'),
+          ctx = canvas.getContext('2d'),
+          img = new Image()
+      img.src = baseImage
+      img.onload = function(){
+        if (img.height/img.width >= allCanvasHeight/allCanvasWidth){
+          $('#leftmove').removeClass('selected')
+          $('#rightmove').removeClass('selected')
+          $('#upmove').addClass('selected')
+          $('#downmove').addClass('selected')
+          canvas.width = img.width/3
+          canvas.height = img.height
+          for (var i = 0; i < 3; i ++){
+            var x = canvas.width * i
+            var y = 0
+            ctx.drawImage(this, x, y, canvas.width, canvas.height, 0, 0, canvas.width, canvas.height)
+            if (i == 0){
+              baseSplitImage1 = canvas.toDataURL()
+            }
+            else if (i == 1){
+              baseSplitImage2 = canvas.toDataURL()
+            }
+            else{
+              baseSplitImage3 = canvas.toDataURL()
+            }
+            engraver.setImage(i+1, canvas.toDataURL())
+          }
+        }
+        else{
+          $('#leftmove').addClass('selected')
+          $('#rightmove').addClass('selected')
+          $('#upmove').removeClass('selected')
+          $('#downmove').removeClass('selected')
+          var individualCanvasWidth = img.height*(allCanvasWidth/3)/allCanvasHeight,
+              sx = 0,
+              sy = 0,
+              sw = img.width,
+              sh = img.height,
+              dy = 0,
+              dw = img.width,
+              dh = img.height
+          for (var i = 0; i < 3; i ++){
+            canvas.height = img.height
+            canvas.width = img.width*2-individualCanvasWidth
+            var dx = img.width-((i+1)*individualCanvasWidth)
+            ctx.drawImage(this, sx, sy, sw, sh, dx, dy, dw, dh)
+            if (i == 0){
+              baseSplitImage1 = canvas.toDataURL()
+            }
+            else if (i == 1){
+              baseSplitImage2 = canvas.toDataURL()
+            }
+            else{
+              baseSplitImage3 = canvas.toDataURL()
+            }
+            engraver.setImage(i+1, canvas.toDataURL())
+          }
+        }
+      }
+    }
+  }else{
+    engraver.setImage(1, baseSplitImage1)
+    engraver.setImage(2, baseSplitImage2)
+    engraver.setImage(3, baseSplitImage3)
+  }
+  var imageFullyUploaded = setInterval(function(){
+    if(engraver.initReady){
+      setTimeout(function(){
+        engraver.clearSelection()
+        $('body .product-single__photos').removeClass('is_loading')
+        $('.triptych-mover.selected').show()
+        $('#sizes').prop('disabled', false)
+        $('.lockable').removeClass('button_lockout')
+      },500)
+      clearInterval(imageFullyUploaded)
+    }
+  },500)
+}
+
+  
+function changeSize(handle){
+  window.history.pushState("object or string", "Title", "/products/" + handle)	//Changes the URL to match the new product selected
+  window.customily.options.handle = handle
+  window.customily.initialize()
+  if( changeSizeCalled == false ){
+    engraver.canvasWrapper.addEventListener('productLoaded', function(){
+      uploadTriptych(baseImage, 'changeSize')
+    })
+  }
+  changeSizeCalled = true
+}
+
+  
+function changeInfo(handle){
+  $.getJSON("/products/" + handle, function(productObject){
+    product = productObject.product
+    console.log(product)
+    var title  = product.title,
+        price = product.variants[0].price,
+        comparePrice = product.variants[0].compare_at_price,
+        desc = product.body_html,
+        variantId = product.variants[0].id
+    $('#productTitle').text(title)
+    $('#productPrice').text('$ ' + price + ' USD')
+    $('#ComparePrice').text('$ ' + comparePrice + ' USD')
+    $('#triptych-product-description').html(desc)
+    $('.hidden_sel').first().val(variantId)
+  })
+}
+  
+  
+setTimeout(function detectHulkapps(){
+  if($('.hulkapps_option_set').length) {
+    document.dispatchEvent(new CustomEvent('hulkappsLoadedFully'))
+    return !0
+  }
+  setTimeout(detectHulkapps, 100)
+}, 100)
+  
+
+document.addEventListener('hulkappsLoadedFully', function(e){
+  $.getJSON("/cart.js", function(response){
+    var alreadyHasFastShipping = false;
+    var numitems = response.item_count;
+    for(var i = 0; i < numitems; i++){
+      var digital_proof = response.items[i].properties['Digital Proof']
+      var fast_shipping = response.items[i].properties['Next Day Shipping'];
+      if (fast_shipping != undefined ){
+        if(!fast_shipping.includes('No')){
+          $('.hulkapps_option:eq(0)').addClass('is_hidden')
+          $('.hulkapps_option:eq(1)').addClass('is_hidden');
+        }
+      }
+      if(digital_proof != undefined){
+        if(!digital_proof.includes('No')){
+          $('.hulkapps_option:eq(1)').addClass('is_hidden');
+        }
+      }
+    }
+  })
+  $('.hulkapps_check_option').each(function(){
+    if ($(this).text().includes("Digital")){
+      $(this).parent().append("<div class = 'hulkapps-tooltip'><span class = 'hulkapps-tooltip'><img style = 'width: 15px;' src = 'https://productoption.hulkapps.com/tooltip.svg'></span><div class = 'hulkapps-tooltip-inner'>Receive a preview of how your finished canvas will look (This option adds 3 days to shipping)</div></div>")
+    }
+    if ($(this).text().includes("Next Day")){
+      $(this).parent().append("<div class = 'hulkapps-tooltip'><span class = 'hulkapps-tooltip'><img style = 'width: 15px;' src = 'https://productoption.hulkapps.com/tooltip.svg'></span><div class = 'hulkapps-tooltip-inner'>Your entire order will be shipped on the next available business day</div></div>")
+    }
+    if ($(this).text().includes("Blind")){
+      $(this).parent().append("<div class = 'hulkapps-tooltip'><span class = 'hulkapps-tooltip'><img style = 'width: 15px;' src = 'https://productoption.hulkapps.com/tooltip.svg'></span><div class = 'hulkapps-tooltip-inner'>Removes the CanvasPrints logo from the back of the frame and the packaging</div></div>")
+    }
+  })
+})
+</script>

@@ -1,0 +1,62 @@
+{% comment %}
+  The contents of the cart.liquid template can be found in /sections/cart-template.liquid
+{% endcomment %}
+
+{% section 'cart-template' %}
+
+
+<script src="//code.tidio.co/9t8cyzppithiuv6tlg0r0bcffiz3qymc.js" async></script>
+<!----------------- Edit cart popup code ----------->
+<div id="myModal" class="modal cart-popup">
+<form>
+ <input type="hidden" name="all_values" id="get_all_var_id" value="">
+  <!-- Modal content -->
+  <div class="modal-content">
+    <div class="modal-header">
+<!--       <span class="close">&times;</span> -->
+      <h3 id="productedit_title"></h3>
+       <input type="hidden" name="prod_var_values" id="get_main_prod_var_id" value="">
+      <input type="hidden" name="prod_tot_qty" id="get_tot_prod_qty" value="">
+      <input type="hidden" name="prod_data_key" id="prod_data_key_val" value="">
+      <input type="hidden" name="customily_preview" id="customily-preview-val" value="">
+      <input type="hidden" name="customily_production_url" id="customily-production-url-val" value="">
+      <input type="hidden" name="custom_thumb" id="custom-thumb-val" value="">
+    </div>
+    <div class="modal-body">
+
+      
+    </div>
+
+    <div class="modal-footer">
+	<button class="hulkapp_close btn btn--secondary button hulkapps_btn_cancel" id="btn_cancel" type="button">Cancel</button> &nbsp;&nbsp;&nbsp;&nbsp;
+	<button class="update_save_cart btn btn--primary button hulkapps_btn_save" data-quantity="1" data-product_id="6981533302965">Save changes</button>
+    </div>
+  </div>
+</form>
+</div>
+<!------------------------ End --------------------->
+
+
+<script>
+  $( document ).ready(function() {
+    var modal = document.getElementById("myModal");
+    
+    //var product_id = $('#get_main_prod_var_id').val();
+    /*var product_id = '41012111442101';
+    //var product_id = '6981294489781';
+    $.ajax({
+     url: 'https://137.184.223.104/modalProductOptions.php',
+    // data: {func: 'getProductOptions', product_id: product_id},
+      data: {product_id: product_id},
+      type:'POST',
+      dataType: "json",
+     success: function (data) {
+       	//alert(data.html);
+         $(".modal-body").append(data.html);
+     }
+   });
+    
+    var y = $(".product__price").text();*/
+       //alert(y);
+});
+</script>

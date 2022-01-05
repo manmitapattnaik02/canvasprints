@@ -1,0 +1,9 @@
+{%- if section.settings.show_announcement -%}
+  {%- if section.settings.home_page_only == false or template.name == 'index' -%}
+  
+    <div class="announcement-bar">
+      <p class="announcement-bar__message"></p>
+	  </div>
+    
+  {%- endif -%}
+{%- endif -%}

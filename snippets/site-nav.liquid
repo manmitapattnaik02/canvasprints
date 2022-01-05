@@ -1,0 +1,115 @@
+
+{% comment %}
+  List out your main-menu linklist (default)
+
+  More info on linklists:
+    - http://docs.shopify.com/themes/liquid-variables/linklists
+{% endcomment %}
+<nav>
+  <ul class="site-nav" id="AccessibleNav">
+    {% for link in site-nav.links %}
+      {% if link.links != blank %}
+      {% assign parent_index = forloop.index %}
+        <li 
+          class="site-nav--has-dropdown {% if link.active %}site-nav--active{% endif %}"
+          aria-haspopup="true">
+          <a
+            href="{{ link.url }}"
+            class="site-nav__link"
+            data-meganav-type="parent"
+            aria-controls="MenuParent-{{ parent_index }}"
+            aria-expanded="false"
+            {% unless template.name == 'index' %}{% if link.active %}aria-current="page"{% endif %}{% endunless%}>
+              {{ link.title | escape }}
+              <span class="icon icon-arrow-down" aria-hidden="true"></span>
+          </a>
+          <ul
+            id="MenuParent-{{ parent_index }}"
+            class="site-nav__dropdown {% if link.levels == 2 %}site-nav--has-grandchildren{% endif %}"
+            data-meganav-dropdown>
+            {% for childlink in link.links %}
+              {% if childlink.links != blank %}
+              {% assign child_index = forloop.index %}
+                <li
+                  class="site-nav--has-dropdown site-nav--has-dropdown-grandchild {% if childlink.active %}site-nav--active{% endif %}"
+                  aria-haspopup="true">
+                  <a
+                    href="{{ childlink.url }}"
+                    class="site-nav__link"
+                    aria-controls="MenuChildren-{{ parent_index }}-{{ child_index }}"
+                    data-meganav-type="parent"
+                    {% unless template.name == 'index' %}{% if childlink.active %}aria-current="page"{% endif %}{% endunless%}
+                    tabindex="-1">
+                      {{ childlink.title | escape }}
+                      <span class="icon icon-arrow-down" aria-hidden="true"></span>
+                  </a>
+                  <ul
+                    id="MenuChildren-{{ parent_index }}-{{ child_index }}"
+                    class="site-nav__dropdown-grandchild"
+                    data-meganav-dropdown>
+                    {% for grandchildlink in childlink.links %}
+                      <li{% if grandchildlink.active %} class="site-nav--active"{% endif %}>
+                        <a 
+                          href="{{ grandchildlink.url }}"
+                          class="site-nav__link"
+                          data-meganav-type="child"
+                          {% unless template.name == 'index' %}{% if grandchildlink.active %}aria-current="page"{% endif %}{% endunless %}
+                          tabindex="-1">
+                            {{ grandchildlink.title | escape }}
+                          </a>
+                      </li>
+                    {% endfor %}
+                  </ul>
+                </li>
+              {% else %}
+                <li{% if childlink.active %} class="site-nav--active"{% endif %}>
+                  <a
+                    href="{{ childlink.url }}"
+                    class="site-nav__link"
+                    data-meganav-type="child"
+                    {% if childlink.active %}aria-current="page"{% endif %}
+                    tabindex="-1">
+                      {{ childlink.title | escape }}
+                  </a>
+                </li>
+              {% endif %}
+            {% endfor %}
+          </ul>
+        </li>
+      {% else %}
+        <li{% if link.active %} class="site-nav--active"{% endif %}>
+          {% if link.title == 'Upload Your Photo' and template.name == "product" %}{% continue %}{% endif %}
+          {% if link.title == 'Upload Your Photo' and template.name == "cart" %}{% continue %}{% endif %}
+          <a
+            {% if link.title == 'Upload Your Photo' %}
+              style = "background-color: #ed1b67; border-radius: 7px; color: white; font-weight:bold; padding: 2px 15px 2px 15px;"
+            {%endif%}
+            {% if link.title == 'Refer A Friend' %}
+              style = 'background-color: black; color: white; border-radius: 7px; font-weight: bold; padding: 2px 15px 2px 15px;'
+            {% endif %}
+            href="{{ link.url }}"
+            class="site-nav__link"
+            data-meganav-type="child"
+            {% unless template.name == 'index' %}{% if link.active %}aria-current="page"{% endif %}{% endunless%}>
+              {{ link.title | escape }}
+          </a>
+        </li>
+      {% endif %}
+    {% endfor %}
+  </ul>
+</nav>
+<!--
+<nav class = "site-nav">
+  <ul>
+    <li style = 'display: inline;'>
+      <a style = 'display: inline;' data-href="no-link" href="javascript:void(0);" aria-label="(855) 226-8279" data-no-instant="" class="site-nav__link"><i class="fa fa-phone" aria-hidden="true"></i>(855) 226-8279</a>
+    </li>
+    <li style = 'display: inline;'>
+      <a style = 'display: inline;' data-href="no-link" href="javascript:void(0);" aria-label="info@canvasprints.com" data-no-instant="" class="site-nav__link"><i class="fa fa-envelope" aria-hidden="true"></i>info@canvasprints.com</a>
+    </li>
+    <li style = 'display: inline;'>
+      <a style = 'display: inline;' data-href="no-link" href="javascript:void(0);" aria-label="Free Shipping on all orders over $150" data-no-instant="" class="site-nav__link"><i class="fa fa-ship" aria-hidden="true"></i>Free Shipping on all orders over $150</a>
+    </li>
+  </ul>
+</nav>
+-->

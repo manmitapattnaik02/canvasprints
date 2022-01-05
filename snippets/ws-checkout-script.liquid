@@ -1,0 +1,119 @@
+{% capture raw_key %}{% include 'ws-group-key' %}{% endcapture %}
+{% assign ws_group_key = raw_key | strip %}
+{% assign discount_group = shop.metafields.ws_groups[ws_group_key] %}
+{% assign hmac = shop.permanent_domain | append: customer.id | hmac_sha256: shop.metafields.ws_genius.secret %}
+{% if discount_group %}
+    <script>
+      var checkout = {};
+      checkout.hmac = {{ hmac | json }};
+      checkout.shop = {{ shop.permanent_domain | json }};
+      checkout.customerId = {{ customer.id | json }};
+      var checkoutUrl = "{{ shop.metafields.ws_genius.checkout_url }}";
+      var errorMessage = 'Something went wrong. Please contact support.';
+
+      // Modify CSS selectors below if you are getting "Cart changed" error,
+      // most likely, you have multiple cart forms on your checkout page,
+      // for example an additional ajax cart in the header.
+      // Checkout script needs to know what form to use.
+
+      // CSS selector for quantity input inside a main cart form
+      var quantityInputSelector = 'form[action="/cart"] input[name="updates[]"]';
+      // CSS selector for checkout button inside a main cart form
+      var checkoutButtonSelector = 'form[action="/cart"] [name="checkout"]';
+
+      function startLoading(e) {
+        e.target.disabled = true;
+        document.body.style.cursor = 'wait';
+      }
+
+      function stopLoading(e) {
+        e.target.disabled = false;
+        document.body.style.cursor = 'default';
+      }
+
+      function handleRedirect(data) {
+        if (!data.redirectTo) alert("Missing redirect url");
+        if (data.pendingOrder) {
+          request({
+            method: 'POST',
+            url: '/cart/clear.js',
+            cb: function() {
+              window.location.href = data.redirectTo;
+            }
+          });
+        } else {
+          window.location.href = data.redirectTo;
+        }
+      }
+
+      function request(params) {
+        var r = new XMLHttpRequest();
+        r.open(params.method, params.url, true);
+        r.setRequestHeader('Content-Type', 'application/json');
+        r.onload = function() {
+          try {
+            const data = JSON.parse(r.responseText);
+            if (r.status >= 200 && r.status < 400) {
+              params.cb(null, data);
+            } else {
+              params.cb(data.message);
+            }
+          } catch (error) {
+            params.cb(errorMessage);
+          }
+        };
+        r.onerror = function() {
+          params.cb(errorMessage);
+        };
+        r.send(params.data ? JSON.stringify(params.data) : undefined);
+      }
+
+      function updateCart(cb) {
+        var updates = [];
+        [].forEach.call(document.querySelectorAll(quantityInputSelector), function(input) {
+          if (input.offsetParent === null) return;
+          updates.push(parseInt(input.value));
+        });
+        request({
+          method: 'POST',
+          url: '/cart/update.js',
+          data: {updates: updates},
+          cb: cb
+        });
+      }
+
+      function createCheckout(e) {
+        e.preventDefault();
+        startLoading(e);
+
+        function handleError(error) {
+          stopLoading(e);
+          return alert(error);
+        }
+
+        function handleResponse(error, data) {
+          if (error) return handleError(error);
+          handleRedirect(data);
+        }
+
+        updateCart(function(error, data) {
+          if (error) return handleError(error);
+          checkout.items = data.items;
+          request({
+            method: 'POST',
+            url: checkoutUrl,
+            data: checkout,
+            cb: handleResponse
+          });
+        });
+      }
+
+      // call this function in your theme.js if you have an ajax cart that updates html layout
+      function initWholesaleCheckout() {
+        var checkoutBtn = document.querySelector(checkoutButtonSelector);
+        checkoutBtn.addEventListener('click', createCheckout);
+      }
+
+      document.addEventListener('DOMContentLoaded', initWholesaleCheckout);
+    </script>
+{% endif %}

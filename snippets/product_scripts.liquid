@@ -1,0 +1,680 @@
+{% for item in all_products %}
+<div class="product-cell" style="text-align: center">{{ item.id }}</div>
+{% endfor %}
+
+
+<script>
+var allProducts = []
+var baseImage = ''
+var engraverSet = false
+var customilyListenerSet = false
+var currentHeight = '8'
+var currentWidth = '8'
+var grayscaled = false
+var baseImageGray = ''
+var todoCheck = 0
+var variantNumberChanged = false
+
+$(document).ready(function(){
+
+  $("#modalAddToCart").click(function(){
+    $(this).hide()
+    $('#loadingButtonModal').show()
+    $('.btn-backward').hide()
+    var button = document.querySelector('#loadingButtonModal');
+    var content = document.querySelector('#loadingButtonContentModal');
+    setTimeout(function(){
+      content.textContent = 'Processing'
+      var counter = 0;
+      var loadingDotInterval = setInterval(function(){
+        if( counter > 48){
+          clearInterval(loadingDotInterval)
+        }
+        counter ++
+        content.textContent = 'Processing' + '.'.repeat(counter)
+      }, 2000)
+      }, 5000)
+    
+    var raw_customily_json = engraver.canvas.getObjects().find(i => i.type === 'image-placeholder' && i.id === 1)
+    objects_json = JSON.parse(JSON.stringify(raw_customily_json))
+    delete objects_json.objects[0].src
+    $("#customily_json").val(JSON.stringify(objects_json))
+    
+    var awaitImageUpload = setInterval(function(){
+      url = engraver._getElementsUrls('image', 1)
+      if (url[0] !== undefined){
+        clearInterval(awaitImageUpload)
+        $("#custom_usr_upload_image").val(url)
+      	$('#AddToCart').click()
+      }
+    }, 1000)
+    
+  })
+  /*
+  $('#addToCartButtonModalWrapper').click(function(){
+    $('#customily-cart-btn').hide()
+    $(this).hide()
+    $('#loadingButtonModal').show()
+    $('.btn-backward').hide()
+    var button = document.querySelector('#loadingButtonModal');
+    var content = document.querySelector('#loadingButtonContentModal');
+    setTimeout(function(){
+      content.textContent = 'Processing'
+      var counter = 0;
+      var loadingDotInterval = setInterval(function(){
+        if( counter > 48){
+          clearInterval(loadingDotInterval)
+        }
+        counter ++
+        content.textContent = 'Processing' + '.'.repeat(counter)
+      }, 2000)
+      }, 5000)
+  })
+  
+  */
+  $('.custom_size_div').click(function(){
+    if ($('#height_select').val() != null && $('#width_select').val() != null){
+      h = $('#height_select').val()
+      w = $('#width_select').val()
+      changeSize(h, w, 'custom')
+    }
+  })
+  
+  $('.btn-remove').click(function(){
+    $('.customily-file-input input').first().click()
+  })
+  
+  var detectHulkapps = setInterval(function(){
+    if($('.hulkapps_option_set').length > 0){
+      clearInterval(detectHulkapps)
+      hulkappsLoaded()
+    }
+  },500)
+  
+  $('.btn-backward').click(function(){
+    var modal = document.getElementById("myModal");
+    modal.style.display = "none";
+  })
+  $('.size_select').change(function(){
+    if ($('#height_select').val() != null && $('#width_select').val() != null){
+      h = $('#height_select').val()
+      w = $('#width_select').val()
+      changeSize(h, w, 'custom')
+    }
+  })
+  //Gets the recommended size baed on pixel height and width
+  function changeToRecommendedSize(){
+    var img = new Image();
+    img.src = baseImage;
+    img.onload = function(){
+      pixelHeight = img.height
+      pixelWidth = img.width
+      if(pixelHeight >= pixelWidth){
+        var largestInches = pixelHeight/72
+        var smallestInches = pixelWidth/72
+        var heightIsLarger = true
+      }else{
+        var largestInches = pixelWidth/72
+        var smallestInches = pixelHeight/72
+        var heightIsLarger = false
+      }
+      if (largestInches <= 24 && smallestInches <= 18){
+        var largestCanv = Math.round(largestInches)
+        var smallestCanv = Math.round(smallestInches)
+      }else if (largestInches > 24 && smallestInches <= 18){
+        var largestCanv = 24
+        var smallestCanv = Math.round(smallestInches * (24/largestInches))
+      }else if (largestInches <= 24 && smallestInches > 18){
+        var largestCanv = Math.round(largestInches * (18/smallestInches))
+        var smallestCanv = 18
+      }else{
+        var smallestRatio = 18/smallestInches
+        var largestRatio = 24/largestInches
+        var ratio = Math.min(18/smallestInches, 24/largestInches)
+        var smallestCanv = Math.round(ratio*smallestInches)
+        var largestCanv = Math.round(ratio*largestInches)
+      }
+      if (smallestCanv < 8){
+        largestCanv = Math.round(largestCanv * (8/smallestCanv))
+        smallestCanv = 8
+        if (largestCanv > 24){
+          largestCanv = 24
+        }
+      }
+      if (heightIsLarger){
+        changeSize(largestCanv, smallestCanv, 'recommended')
+      }else{
+        changeSize(smallestCanv, largestCanv, 'recommended');
+      }
+    }
+  }
+  
+  //Launch The Modal
+  $('#modallauncher').click(function(){
+    if(window.innerWidth <= 900){
+      $('#custom-atc-btn').hide()
+      $('#modallauncher').hide()
+      $('.loadingButton').removeClass('is_hidden')
+      var button = document.querySelector('.loadingButton');
+      var content = document.querySelector('.loadingButtonContent');
+      setTimeout(function(){
+        content.textContent = 'Processing'
+        var counter = 0;
+        var loadingDotInterval = setInterval(function(){
+          if( counter > 48){
+            clearInterval(loadingDotInterval)
+          }
+          counter ++
+          content.textContent = 'Processing' + '.'.repeat(counter)
+        }, 2000)
+        }, 5000)
+      $('.custom-atc-btn').hide()
+      $('.loadingButton2').removeClass('is_hidden')
+      var button2 = document.querySelector('.loadingButton2');
+      var content2 = document.querySelector('.loadingButtonContent2');
+      setTimeout(function(){
+        content2.textContent = 'Processing'
+        var counter2 = 0;
+        var loadingDotInterval2 = setInterval(function(){
+          if( counter2 > 48){
+            clearInterval(loadingDotInterval2)
+          }
+          counter2 ++
+          content2.textContent = 'Processing' + '.'.repeat(counter2)
+        }, 2000)
+        }, 5000)
+    var raw_customily_json = engraver.canvas.getObjects().find(i => i.type === 'image-placeholder' && i.id === 1)
+    objects_json = JSON.parse(JSON.stringify(raw_customily_json))
+    delete objects_json.objects[0].src
+    $("#customily_json").val(JSON.stringify(objects_json))
+    
+    var awaitImageUpload = setInterval(function(){
+      console.log('getting url')
+      url = engraver._getElementsUrls('image', 1)
+      if (url[0] !== undefined){
+        console.log(url)
+        clearInterval(awaitImageUpload)
+        $("#custom_usr_upload_image").val(url)
+      	$('form.product-form--wide #customily-cart-btn').trigger('click')
+      }
+    }, 1000)
+      
+      //$('form.product-form--wide #customily-cart-btn').trigger('click')
+    }
+    else{
+      var modal = document.getElementById("myModal");
+      modal.style.display = "block";
+    }
+  })
+  
+  // Displaying sub modal
+  $('form.product-form--wide .modal-content').on('click', 'div[data-parent-id] [data-label]', function(e){
+    if($('form.product-form--wide .modal-content').find('.sub-modal-item[data-sub-mod="'+ $(this).attr('data-label') +'"]').length > 0) {
+      $('form.product-form--wide .modal-content').find('.modal-content--inner').addClass('is_hidden')
+      $('form.product-form--wide .modal-content').find('.sub-modal-item[data-sub-mod]').removeClass('is_active')
+      $('form.product-form--wide .modal-content').find('.sub-modal-item[data-sub-mod="'+ $(this).attr('data-label') +'"]').addClass('is_active')
+    }
+  })
+  
+  // Toggle sub modal to main 
+  $('form.product-form--wide .modal-content').on('click', '.action-wrap a', function(e){
+    $(this).closest('.sub-modal-item').removeClass('is_active')
+    $('form.product-form--wide .modal-content').find('.modal-content--inner').removeClass('is_hidden')
+  })
+  
+  //Change the size
+  function changeSize(h, w, type){
+    if ((h > 24 || w > 24) || (h > 18 && w > 18)){
+      $('.option_type_id_272051').hide()
+    }
+    $('.option_type_id_272051')
+    $('body .product-single__photos').addClass('is_loading')
+    $(".size__options").addClass("button_lockout")
+    $("#modallauncher").addClass("button_lockout")
+    $('#custom-atc-btn').addClass('button_lockout')
+    $('.customily-mobile-controls').addClass('button_lockout')
+    if (type == 'popular'){
+      currentHeight = h
+      currentWidth = w
+      $.getJSON("/products/" + h + 'x' + w + '-canvas-photo-print.js',function(product){
+        $('#productTitle').text(product.title)
+        $('.hidden_sel').first().val(product.variants[0].id)
+        variantNumberChanged = true
+        $("nav span:nth-child(3)").text(product.title);
+        window.customily.options.handle = h + 'x' + w + '-canvas-photo-print'
+        window.customily.initialize()
+        if(engraverSet == false){
+          engraver.canvasWrapper.addEventListener('productLoaded', function(){
+            engraverSet = true
+            engraver.setImage(1,baseImage)
+          })
+        }
+      })
+    }
+    else if (type == 'recommended'){
+      currentHeight = h
+      currentWidth = w
+      $.getJSON("/products/" + h + 'x' + w + '-canvas-photo-print.js',function(product){
+        $('#productTitle').text(product.title)
+        $('.hidden_sel').first().val(product.variants[0].id)
+        variantNumberChanged = true
+        $("nav span:nth-child(3)").text(product.title);
+        window.customily.options.handle = h + 'x' + w + '-canvas-photo-print'
+        window.customily.initialize()
+        if(engraverSet == false){
+          engraver.canvasWrapper.addEventListener('productLoaded', function(){
+            engraverSet = true
+            engraver.setImage(1, baseImage)
+          })
+        }
+        $('.option-wrapper').removeClass('is_selected')
+        $('#recommended_size').addClass('is_selected')
+        $('#recommended_size').removeClass('is_hidden')
+        $('#recommended_size').find('.size_text').html(h + '" x ' + w + '"')
+        $('#recommended_size').find('.option_price').html((product['price']/100).toFixed(2))
+        $('#recommended_size').find('.option_compare_price').html('$' + product['compare_at_price']/100)
+      })
+    }
+    else if (type == 'custom'){
+      currentHeight = h
+      currentWidth = w
+      $.getJSON("/products/" + h + 'x' + w + '-canvas-photo-print.js',function(product){
+        $('#productTitle').text(product.title)
+        $('.hidden_sel').first().val(product.variants[0].id)
+        variantNumberChanged = true
+        $("nav span:nth-child(3)").text(product.title);
+        window.customily.options.handle = h + 'x' + w + '-canvas-photo-print'
+        window.customily.initialize()
+        if(engraverSet == false){
+          engraver.canvasWrapper.addEventListener('productLoaded', function(){
+            engraverSet = true
+            engraver.setImage(1,baseImage)
+          })
+        }
+        $('.custom_size--price').html('$' + (product['price']/100).toFixed(2))
+      })
+      $('.option-wrapper').removeClass('is_selected')
+      $('.custom_size_div').addClass('is_selected')
+    }
+    else if (type == 'rotate'){
+      if(currentWidth != currentHeight){
+        $.getJSON("/products/" + currentWidth + 'x' + currentHeight + '-canvas-photo-print.js',function(product){
+          $('#productTitle').text(product.title)
+          $('.hidden_sel').first().val(product.variants[0].id)
+          variantNumberChanged = true
+          $("nav span:nth-child(3)").text(product.title);
+          window.customily.options.handle = currentWidth + 'x' + currentHeight + '-canvas-photo-print'
+          window.customily.initialize()
+          temp = currentHeight
+          currentHeight = currentWidth
+          currentWidth = temp
+          if(engraverSet == false){
+            engraver.canvasWrapper.addEventListener('productLoaded', function(){
+              engraverSet = true
+              engraver.setImage(1,baseImage)
+            })
+          }
+        })
+      }else{
+        console.log('Why are you trying to rotate a square canvas?  I mean ill add the loading wheel if it makes you feel better')
+      }
+    }
+      var imageFullyUploaded = setInterval(function(){
+        if(engraver.initReady){
+          if(todoCheck == 1 && variantNumberChanged){
+            setTimeout(function(){
+              todoCheck = 0
+              console.log("ENGRAVER READY")
+              engraver.clearSelection()
+              setTimeout(function(){
+                engraver.clearSelection()
+              }, 1000)
+              $('.upload--notification .upload-info').removeClass('is_hidden')
+              $('#customily-cart-btn').removeClass('button_lockout')
+              $('body .product-single__photos').removeClass('is_loading')
+              $(".size__options").removeClass("button_lockout")
+              $("#modallauncher").removeClass("button_lockout")
+              $("#custom-atc-btn").removeClass("button_lockout")
+              $('.customily-mobile-controls').removeClass('button_lockout')
+              variantNumberChanged = false
+            },1000)
+          }
+          else{
+            todoCheck += 1
+          }
+          clearInterval(imageFullyUploaded)
+        }
+      },500)
+  }
+  
+  //Click a popular size
+  $('form.product-form--wide .option-wrapper').on('click', 'input[type="radio"]', function(e){
+    if (!$(this).closest('.option-wrapper').hasClass('is_selected')){
+      $('.option-wrapper').removeClass('is_selected')
+      $('.custom_size_div').removeClass('is_selected')
+      $(this).closest('.option-wrapper').addClass('is_selected')
+      sizeText = $(this).closest('.option-wrapper').find('.size_text').text()
+      var regex = /([0-9])+/gm;
+      var dim = sizeText.match(regex);
+      var h = dim[0];
+      var w = dim[1];
+      changeSize(h, w, 'popular')
+    }
+  })
+    
+  //wait for customily to load in
+  var detectCustomily2 = setInterval(function(){
+    if($('.customily-file-input').length > 0){
+      clearInterval(detectCustomily2)
+      customilyLoaded2()
+    }
+  },500)
+  
+  function customilyLoaded2(){
+    
+    $('#customUploadBtn2').show()
+    $('#customUploadBtn2').click(function(){
+      $('.customily-file-input input').last().click()
+      
+    })
+    
+    window.addEventListener('customily-done', function(){
+      if(todoCheck == 1 && variantNumberChanged){
+        setTimeout(function(){
+          todoCheck = 0
+          console.log("CUSTOMILY DONE")
+          $('.upload--notification .upload-info').removeClass('is_hidden')
+          $('#customily-cart-btn').removeClass('button_lockout')
+          engraver.clearSelection()
+          $('body .product-single__photos').removeClass('is_loading')
+          $(".size__options").removeClass("button_lockout")
+          $("#modallauncher").removeClass("button_lockout")
+          $("#custom-atc-btn").removeClass("button_lockout")
+          $('.customily-mobile-controls').removeClass('button_lockout')
+          variantNumberChanged = false
+        },1000)
+      }
+      else{
+        todoCheck += 1
+      }
+      window.customily.optionsapp.$data.sets[0].options.filter(function(option){
+        return option.type == "Image Upload"
+      }).forEach(function(option){
+        option.value = baseImage
+        //option.isVisible = false
+        //customily.optionsapp.visibilityCheck(window.customily.optionsapp.$data.sets[0].set_id, option);
+      })
+    })
+    
+    
+//File Upload Event
+    $('.customily-file-input input').first().change(function(e){
+      $('#customUploadBtn2').hide()
+      if(window.innerWidth <= 900){
+      	$('#custom-atc-btn').show()
+      }
+      $('#custom-atc-btn').click(function(){
+        $('#primary-mobile-atc').click()
+        $('#custom-atc-btn').addClass('is_hidden')
+        
+      })
+      var _custom_btns = '<div class="custom-btns--wrap"><div id="grayscale"><span>Change to Black and White</span></div><div id="rotate"><span>Rotate Canvas</span></div></div>'
+      if($('body .customily-mobile-controls').find('#grayscale').length == 0){
+        $('body').find('.customily-mobile-controls').prepend(_custom_btns)
+        $('#rotate').click(function(){
+          changeSize(currentHeight, currentWidth, 'rotate')
+        })
+        $('#grayscale').click(function(){
+          $("#modallauncher").addClass("button_lockout")
+    	  $('#custom-atc-btn').addClass('button_lockout')
+          $(".size__options").addClass("button_lockout")
+          $('.customily-mobile-controls').addClass('button_lockout')
+          if($(this).text() == 'Change to Black and White'){
+            grayscaled = true
+            $(this).html("<span>Change to Color</span>");
+            var cnv = document.getElementById("output");
+            var cnx = cnv.getContext("2d");
+            var img = new Image();
+            img.src = baseImage;
+            img.onload = function(){
+              cnv.width = img.width;
+              cnv.height = img.height;
+              var width = img.width
+              var height = img.height;
+              cnx.drawImage(img, 0, 0);
+              var imgPixels = cnx.getImageData(0,0,width,height)
+              for(var y = 0; y < height; y++){
+                for(var x = 0; x < width; x++){
+                  var i = (y * 4) * width + x * 4;
+                  var avg = (imgPixels.data[i] + imgPixels.data[i + 1] + imgPixels.data[i + 2]) / 3;
+                  imgPixels.data[i] = avg;
+                  imgPixels.data[i + 1] = avg;
+                  imgPixels.data[i + 2] = avg;
+                }
+              }
+              cnx.putImageData(imgPixels, 0, 0, 0, 0, imgPixels.width, imgPixels.height)
+              baseImageGray = cnv.toDataURL();
+              engraver.setImage(1, baseImageGray)
+              $("#modallauncher").removeClass("button_lockout")
+              $("#custom-atc-btn").removeClass("button_lockout")
+              $(".size__options").removeClass("button_lockout")
+              $('.customily-mobile-controls').removeClass('button_lockout')
+            }
+          }
+          else{
+            grayscaled = false
+            $(this).html("<span>Change to Black and White</span>");
+            engraver.setImage(1, baseImage)
+            $("#modallauncher").removeClass("button_lockout")
+            $("#custom-atc-btn").removeClass("button_lockout")
+            $(".size__options").removeClass("button_lockout")
+            $('.customily-mobile-controls').removeClass('button_lockout')
+          }
+        }
+      )}
+      var imageFile = e.target.files[0]
+      $('.filename--uploaded').text(imageFile.name)
+      var reader = new FileReader()
+      reader.readAsDataURL(imageFile)
+      reader.onload = function(){
+        baseImage = reader.result
+        changeToRecommendedSize()
+      }
+      $('.product-main--contents .product-single__photos').addClass('photo_loaded') 
+      $('.postUpload').show()
+      $('.preUpload').hide()
+    })
+  }
+  
+  
+  //wait for customily to load in
+  var detectCustomily = setInterval(function(){
+    if($('.customily-file-input').length > 0){
+      clearInterval(detectCustomily)
+      customilyLoaded()
+    }
+  },500)
+
+  function customilyLoaded(){
+    $('#customUploadBtn').show()
+    $('#customUploadBtn').click(function(){
+      $('.customily-file-input input').last().click()
+    })
+    window.addEventListener('customily-done', function(){
+      if(todoCheck == 1 && variantNumberChanged){
+        setTimeout(function(){
+          todoCheck = 0
+          console.log("CUSTOMILY DONE")
+          $('.upload--notification .upload-info').removeClass('is_hidden')
+          $('#customily-cart-btn').removeClass('button_lockout')
+          engraver.clearSelection()
+          $('body .product-single__photos').removeClass('is_loading')
+          $(".size__options").removeClass("button_lockout")
+          $("#modallauncher").removeClass("button_lockout")
+          $("#custom-atc-btn").removeClass("button_lockout")
+          $('.customily-mobile-controls').removeClass('button_lockout')
+          variantNumberChanged = false
+        },1000)
+      }
+      else{
+        todoCheck += 1
+      }
+      window.customily.optionsapp.$data.sets[0].options.filter(function(option){
+        return option.type == "Image Upload"
+      }).forEach(function(option){
+        option.value = baseImage
+        //option.isVisible = false
+        //customily.optionsapp.visibilityCheck(window.customily.optionsapp.$data.sets[0].set_id, option);
+      })
+    })
+    
+    
+//File Upload Event
+    $('.customily-file-input input').first().change(function(e){
+      var _custom_btns = '<div class="custom-btns--wrap"><div id="grayscale"><span>Change to Black and White</span></div><div id="rotate"><span>Rotate Canvas</span></div></div>'
+      if($('body .customily-mobile-controls').find('#grayscale').length == 0){
+        $('body').find('.customily-mobile-controls').prepend(_custom_btns)
+        $('#rotate').click(function(){
+          changeSize(currentHeight, currentWidth, 'rotate')
+        })
+        $('#grayscale').click(function(){
+          if($(this).text() == 'Change to Black and White'){
+            grayscaled = true
+            $(this).html("<span>Change to Color</span>");
+            var cnv = document.getElementById("output");
+            var cnx = cnv.getContext("2d");
+            var img = new Image();
+            img.src = baseImage;
+            img.onload = function(){
+              cnv.width = img.width;
+              cnv.height = img.height;
+              var width = img.width
+              var height = img.height;
+              cnx.drawImage(img, 0, 0);
+              var imgPixels = cnx.getImageData(0,0,width,height)
+              for(var y = 0; y < height; y++){
+                for(var x = 0; x < width; x++){
+                  var i = (y * 4) * width + x * 4;
+                  var avg = (imgPixels.data[i] + imgPixels.data[i + 1] + imgPixels.data[i + 2]) / 3;
+                  imgPixels.data[i] = avg;
+                  imgPixels.data[i + 1] = avg;
+                  imgPixels.data[i + 2] = avg;
+                }
+              }
+              cnx.putImageData(imgPixels, 0, 0, 0, 0, imgPixels.width, imgPixels.height)
+              baseImageGray = cnv.toDataURL();
+              engraver.setImage(1, baseImageGray)
+            }
+          }
+          else{
+            grayscaled = false
+            $(this).html("<span>Change to Black and White</span>");
+            engraver.setImage(1, baseImage)
+          }
+        }
+      )}
+      var imageFile = e.target.files[0]
+      $('.filename--uploaded').text(imageFile.name)
+      var reader = new FileReader()
+      reader.readAsDataURL(imageFile)
+      reader.onload = function(){
+        baseImage = reader.result
+        changeToRecommendedSize()
+      }
+      $('.product-main--contents .product-single__photos').addClass('photo_loaded') 
+      $('.postUpload').show()
+      $('.preUpload').hide()
+    })
+  }
+  
+  
+//Put in popular-size prices
+  var sizetext = window.location.pathname.split('/').pop().split('-')[0]
+      $('.'+sizetext).addClass('is_selected')
+      //load popular sizes info
+      $.getJSON('/products/8x8-canvas-photo-print.js', function(product){
+        allProducts[0] = product
+      })
+      $.getJSON('/products/11x14-canvas-photo-print.js', function(product){
+        allProducts[1] = product
+      })
+      $.getJSON('/products/12x18-canvas-photo-print.js', function(product){
+        allProducts[2] = product
+      })
+      $.getJSON('/products/24x36-canvas-photo-print.js', function(product){
+        allProducts[3] = product
+      })
+
+  var allProductInfoLoaded = setInterval(function(){
+    for(var i = 0; i < 4; i ++){
+      if(typeof allProducts[i] == 'undefined'){
+        break;
+      }
+      else if (i == 3){
+        clearInterval(allProductInfoLoaded)
+        for(var j = 0; j < 4; j++){
+          $('.option_price:eq('+j+')').text(allProducts[j].price/100)
+          $('.option_compare_price:eq('+j+')').text('$'+(allProducts[j].compare_at_price/100).toFixed(2))
+        }
+        $('.currency_symbol').text('$')
+      }
+    }
+  }, 1000)
+    
+})
+
+  function hulkappsLoaded() {
+    $.getJSON("/cart.js", function(response){	//Checks cart to see if you already have an item with 'next day shipping'.  If so it removes the option
+      var alreadyHasFastShipping = false;
+      var numitems = response.item_count;
+      for(var i = 0; i < numitems; i++){
+        var digital_proof = response.items[i].properties['Digital Proof']
+        var fast_shipping = response.items[i].properties['Next Day Shipping'];
+        if (fast_shipping != undefined){
+          if(!fast_shipping.includes('No')){ //.includes is not supported in IE (last release in 2015).  If it is a significant issue this will need an alternative
+            $(".option_type_id_278946").hide();
+            $(".option_type_id_262780").hide();
+          }
+        }
+        if(digital_proof != undefined){
+          if(!digital_proof.includes('No')){
+            $(".option_type_id_278946").hide();
+          }
+        }
+      }
+    })
+    $("[for='278946_0']").click(function(){
+      $("[for='262780_0']").addClass("radio_selected")
+    })
+    $("[for='262780_0']").click(function(){
+      $("[for='278946_0']").addClass("radio_selected")
+    })
+    
+    $('form.product-form--wide .modal-content div[data-parent-id]').toArray().forEach(function(e, i){
+      if($(e).find('.hulkapps_option_name').text().includes('Blind Shipped')) {
+        $(e).find('.hulkapps_option_name').html("BLIND SHIPPED<span data-label='BLIND SHIPPED'>What's This?</span>")
+        return
+      }
+      if($(e).find('.hulkapps_option_name').text().includes('Canvas Depth')){
+        $(e).find('.hulkapps_option_name').html("CANVAS DEPTH<span data-label='CANVAS DEPTH'>What's This?</span>")
+        return
+      }
+      if($(e).find('.hulkapps_option_name').text().includes('Hanging Kit')){
+        $(e).find('.hulkapps_option_name').html("HANGING KIT<span data-label='HANGING KIT'>What's This?</span>")
+        return
+      }
+      if($(e).find('.hulkapps_option_name').text().includes('Image Border')){
+        $(e).find('.hulkapps_option_name').html("IMAGE BORDER<span data-label='IMAGE BORDER'>What's This?</span>")
+        return
+      }
+      if($(e).find('.hulkapps_option_name').text().includes('Next Day')){
+        $(e).find('.hulkapps_option_name').html("NEXT DAY SHIPPING<span data-label='NEXT DAY SHIPPING'>What's This?</span>")
+        return
+      }
+      if($(e).find('.hulkapps_option_name').text().includes('Digital Proof')){
+        $(e).find('.hulkapps_option_name').html("DIGITAL PROOF<span data-label='DIGITAL PROOF'>What's This?</span>")
+        return
+      }
+    })
+  }
+</script>

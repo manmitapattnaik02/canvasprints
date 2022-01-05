@@ -1,0 +1,101 @@
+{% comment %}
+	GEMPAGE BUILDER (https://apps.shopify.com/gempage)
+
+	You SHOULD NOT modify source code in this page because
+	It is automatically generated from GEMPAGE BUILDER
+	Try to edit page with the live editor.
+{% endcomment %}
+<!--GEM_HEADER-->
+<link data-instant-track rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" class="gf-style" />
+<link data-instant-track rel="stylesheet" type="text/css" href="https://d1um8515vdn9kb.cloudfront.net/files/vendor.css?refresh=1" class="gf-style" />
+<link data-instant-track rel="stylesheet" type="text/css" href="{{ 'gem-article-555531403351.css' | asset_url }}" class="gf_page_style">
+<!--GEM_HEADER_END-->
+{% assign number_of_comments = article.comments_count %}{% if comment and comment.created_at %}
+  {% assign number_of_comments = article.comments_count | plus: 1 %}
+{% endif %}{% paginate article.comments by 5 %}<div class="grid" data-section-id="{{ section.id }}" data-section-type="article-template">  <article class="grid__item post-large--four-fifths">    <div class="grid">
+      <div class="grid__item post-large--ten-twelfths">        <header class="section-header">
+          <h1 class="section-header__title">{{ article.title }}</h1>
+        </header>        <p>
+          {% if section.settings.article_author_enable %}
+            <span class="meta-sep">&#8226;</span>
+            {{ article.author }}
+          {% endif %}
+          {% if article.tags.size > 0 %}
+            <span class="meta-sep">&#8226;</span>
+            {% for tag in article.tags %}
+              <a href="{{ blog.url }}/tagged/{{ tag | handle }}">{{ tag }}</a>{% unless forloop.last %} <span class="meta-sep">&#8226;</span> {% endunless %}
+            {% endfor %}
+          {% endif %}
+        </p>        <div class="rte">
+          <!--Gem_Page_Main_Editor--><div class="clearfix"></div><div class="gryffeditor"></div><div id="divContentBk"></div><!--End_Gem_Page_Main_Editor-->        </div>        {% if section.settings.social_sharing %}
+          <hr class="hr--clear hr--small">
+          {% include 'social-sharing' %}
+        {% endif %}        
+        {% if blog.next_article or blog.previous_article %}
+          <hr class="hr--clear hr--small">
+          <p class="clearfix">
+            {% if blog.previous_article %}
+              <span class="left">
+                &larr; {{ 'blogs.article.older_post' | t | link_to: blog.previous_article }}
+              </span>
+            {% endif %}
+            {% if blog.next_article %}
+              <span class="right">
+                {{ 'blogs.article.newer_post' | t | link_to: blog.next_article }} &rarr;
+              </span>
+            {% endif %}
+          </p>
+        {% endif %}        {% if blog.comments_enabled? %}
+          <hr class="hr--clear hr--small">                      
+            <div id="comments">              {% if comment and comment.created_at %}
+                <p class="note form-success">
+                  {% if blog.moderated? %}
+                    {{ 'blogs.comments.success_moderated' | t }}
+                  {% else %}
+                    {{ 'blogs.comments.success' | t }}
+                  {% endif %}
+                </p>
+              {% endif %}              {% if number_of_comments > 0 %}
+                <ul>
+                  
+                  {% if comment and comment.created_at %}
+                    <li id="{{ comment.id }}" class="comment first{% if article.comments_count == 0 %} last{% endif %}">
+                      {% include 'comment' %}
+                    </li>
+                  {% endif %}                  
+                  {% for comment in article.comments %}
+                    <li id="{{ comment.id }}" class="comment{% unless number_of_comments > article.comments_count %}{% if forloop.first %} first{% endif %}{% endunless %}{% if forloop.last %} last {% endif %}">
+                      {% include 'comment' %}
+                    </li>
+                  {% endfor %}
+                </ul>                {% if paginate.pages > 1 %}
+                  <hr class="--clear hr--small">
+                  <div class="text-center">
+                    {% include 'pagination-custom' %}
+                  </div>
+                {% endif %}                <hr class="hr--clear hr--small">              {% endif %}              
+              {% form 'new_comment', article %}                <h2 class="h4">{{ 'blogs.comments.title' | t }}</h2>                {{ form.errors | default_errors }}                <div class="grid">                  <div class="grid__item post-large--one-half">
+                    <label for="CommentAuthor" class="label--hidden">{{ 'blogs.comments.name' | t }}</label>
+                    <input {% if form.errors contains "author" %} class="error"{% endif %} type="text" name="comment[author]" placeholder="{{ 'blogs.comments.name' | t }}" id="CommentAuthor" value="{{ form.author }}" autocapitalize="words">                    <label for="CommentEmail" class="label--hidden">{{ 'blogs.comments.email' | t }}</label>
+                    <input {% if form.errors contains "email" %} class="error"{% endif %} type="email" name="comment[email]" placeholder="{{ 'blogs.comments.email' | t }}" id="CommentEmail" value="{{ form.email }}" autocorrect="off" autocapitalize="off">
+                  </div>                  <div class="grid__item">
+                    <label for="CommentBody" class="label--hidden">{{ 'blogs.comments.message' | t }}</label>
+                    <textarea {% if form.errors contains "body" %} class="error"{% endif %} name="comment[body]" id="CommentBody" placeholder="{{ 'blogs.comments.message' | t }}">{{ form.body }}</textarea>
+                  </div>                </div>                {% if blog.moderated? %}
+                  <p><small>{{ 'blogs.comments.moderated' | t }}</small></p>
+                {% endif %}                <input type="submit" class="btn" value="{{ 'blogs.comments.post' | t }}">              {% endform %}            </div>        {% endif %}      </div>
+    </div>
+  </article>  <aside class="sidebar grid__item post-large--one-fifth">
+    {% include 'blog-sidebar' %}
+  </aside>
+</div>{% endpaginate %}
+<!--GEM_FOOTER-->
+{% capture GEM_FOOTER_SCRIPT %}
+<script data-instant-track type="text/javascript">
+	var pageLibs = [		'{{ 'gem-article-555531403351.js' | asset_url }}',	];
+</script>
+<script data-instant-track type="text/javascript">
+	var GEMVENDOR = GEMVENDOR || (function(){		var _js = {};		return {			init: function(Args) {				_js = Args;			},			getLibs: function() {				return _js;			}		};	}());	GEMVENDOR.init(pageLibs);</script>
+<script data-instant-track type="text/javascript" src="https://d1um8515vdn9kb.cloudfront.net/files/gempagev2.js?v=1.0" class="gf-script" defer></script>
+{% endcapture %}
+<!--GEM_FOOTER_END-->

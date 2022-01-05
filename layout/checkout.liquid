@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="{{ locale }}" dir="{{ direction }}" class="{{ checkout_html_classes }}">
+  <head>
+    <script src="/a/app_proxy/bin"></script>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, height=device-height, minimum-scale=1.0, user-scalable=0">
+    <meta name="referrer" content="origin">
+
+    <title>{{ page_title }}</title>
+
+    {{ content_for_header }}
+
+    {{ checkout_stylesheets }}
+    {{ checkout_scripts }}
+
+	<script type="application/javascript" async src="https://sdk.postscript.io/integrations/sdk-min.js"></script>
+	
+	<!-- Start VWO Async SmartCode -->
+	<script type='text/javascript'>
+	window._vwo_code = window._vwo_code || (function(){
+	var account_id=579040,
+	settings_tolerance=2000,
+	library_tolerance=2500,
+	use_existing_jquery=false,
+	is_spa=1,
+	hide_element='body',
+
+	/* DO NOT EDIT BELOW THIS LINE */
+	f=false,d=document,code={use_existing_jquery:function(){return use_existing_jquery;},library_tolerance:function(){return library_tolerance;},finish:function(){if(!f){f=true;var a=d.getElementById('_vis_opt_path_hides');if(a)a.parentNode.removeChild(a);}},finished:function(){return f;},load:function(a){var b=d.createElement('script');b.src=a;b.type='text/javascript';b.innerText;b.onerror=function(){_vwo_code.finish();};d.getElementsByTagName('head')[0].appendChild(b);},init:function(){
+	window.settings_timer=setTimeout(function () {_vwo_code.finish() },settings_tolerance);var a=d.createElement('style'),b=hide_element?hide_element+'{opacity:0 !important;filter:alpha(opacity=0) !important;background:none !important;}':'',h=d.getElementsByTagName('head')[0];a.setAttribute('id','_vis_opt_path_hides');a.setAttribute('type','text/css');if(a.styleSheet)a.styleSheet.cssText=b;else a.appendChild(d.createTextNode(b));h.appendChild(a);this.load('https://dev.visualwebsiteoptimizer.com/j.php?a='+account_id+'&u='+encodeURIComponent(d.URL)+'&f='+(+is_spa)+'&r='+Math.random());return settings_timer; }};window._vwo_settings_timer = code.init(); return code; }());
+	</script>
+	<!-- End VWO Async SmartCode -->
+	
+	<script type="text/javascript"> 
+	window.VWO = window.VWO || []; 
+	{% assign _vis_opt_revenue = total_price | money_without_currency %} 
+	window._vis_opt_queue = window._vis_opt_queue || []; 
+	window._vis_opt_queue.push(function() {_vis_opt_revenue_conversion('{{ _vis_opt_revenue }}'.replace(',', ''));}); 
+	window.VWO.push(['track.revenueConversion','{{ _vis_opt_revenue }}'.replace(',', '')]); 
+	</script>
+  </head>
+  <body>
+    {{ skip_to_content_link }}
+
+    <header class="banner" data-header role="banner">
+      <div class="wrap">
+        {{ content_for_logo }}
+      </div>
+    </header>
+<div class = 'custom-toggle' onclick = 'expandCustomProducts()'>
+    {{ order_summary_toggle }}
+    </div>
+    <div class="content" data-content>
+      <div class="wrap">
+        <div class="main">
+          <header class="main__header" role="banner">
+            {{ content_for_logo }}
+            {{ breadcrumb }}
+            {{ alternative_payment_methods }}
+          </header>
+          <main class="main__content" role="main">
+            {{ content_for_layout }}
+          </main>
+          <footer class="main__footer" role="contentinfo">
+            {{ content_for_footer }}
+          </footer>
+        </div>
+        <aside class="sidebar" role="complementary">
+          <div class="sidebar__header">
+            {{ content_for_logo }}
+          </div>
+          <div class="sidebar__content">
+
+            <div id = 'order-summary' class = 'order-summary order-summary--is-collapsed'>
+          	  <div class = 'order-summary__sectons'>
+                <div class = 'order-summary__section order-summary__section--product-list'>
+                  <div class = 'order-summary__section__content'>
+                    <table id = 'custom-table'>
+                      <tbody>
+                        {% for line_item in checkout.line_items %}
+                          {% assign image_found = false %}
+                          {% assign static_print = false %}
+                          <tr class = 'product'>
+                            <td>
+                              <div class = 'product-thumbnail'>
+                              <div class = 'product-thumbnail__wrapper'>
+                          {% for prop in line_item.properties %}
+                        	  {% if prop.first == '_custom-thumb' %}
+                        		{% assign image_found = true %}
+                        	    <img src = '{{prop.last}}'>
+                        	  {% endif %}
+                              {% if prop.first == '_Type' && prop.last == "Static" %}
+                                {% assign static_print = true %}
+                                <div> {{product}}</div>
+                                {{ line_item.image | img_url: '100x100' | img_tag }}
+                              {% endif %}
+                          {% endfor %}
+                        {% if image_found == false %}
+                          {% unless static_print %}
+                          <img src = '//cdn.shopify.com/shopifycloud/shopify/assets/checkout/product-blank-98d4187c2152136e9fb0587a99dfcce6f6873f3a9f21ea9135ed7f495296090f.png'>
+                          {% endunless %}
+                        {% endif %}
+                            </div>
+                              <span class = 'product-thumbnail__quantity'>{{line_item.quantity}}</span>
+                              </div>
+                          </td>
+                            <th class = 'product__description'>
+                              <span class = 'product__description__name order-summary__emphasis'> {{line_item.title }}</span>
+                              {% for prop in line_item.properties %}
+                              {% unless prop.first contains '_' %}
+                              	<span class = 'product__description__property order-summary__small-text'>
+                              	  {{ prop.first }} : {{ prop.last }}
+                                </span>
+                              {% endunless %}
+                              {% endfor %}
+                            </th>
+                            <td class = 'product__price'>
+                              <span>{{ line_item.price | money}}</span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {{ content_for_order_summary }}
+          </div>
+        </aside>
+      </div>
+    </div>
+
+    {{ tracking_code }}
+  {% render 'banana-stand-footer' %}
+</body>
+</html>
+
+<script>
+  function expandCustomProducts(){
+    var collapsedProducts = document.getElementById('order-summary')
+    if (collapsedProducts.classList.contains('order-summary--is-collapsed')){
+      collapsedProducts.classList.remove('order-summary--is-collapsed')
+      collapsedProducts.classList.add('order-summary--is-expanded')
+    }
+    else{
+      collapsedProducts.classList.remove('order-summary--is-expanded')
+      collapsedProducts.classList.add('order-summary--is-collapsed')
+    }
+  }
+</script>
+<script>
+  
+ var cont = document.querySelectorAll('.product__description .product__description__property').length;
+  for (var i = 0; i < cont; i++) {
+    var nds = document.getElementsByClassName('product__description__property')[i].textContent;
+    //alert(nds.trim());
+    if(nds.trim() == 'NEXT DAY SHIPPING : No'){
+       document.getElementsByClassName('product__description__property')[i].style.display = "none";
+       }
+}
+</script>
+<style>
+  .product-table{
+    display: none!important;
+  }
+  #custom-table{
+    margin-top: 0.75em;
+    margin-bottom: 1.5em;
+    z-index: 1;
+    position: relative;
+  }
+  
+</style>

@@ -1,0 +1,86 @@
+{% comment %}
+  The contents of the product.liquid template can be found in /sections/product-template.liquid
+{% endcomment %}
+<div class="wrapper">
+  <div class="grid">
+    <div class="grid__item">
+    {% section 'free-product-template' %}
+    </div>
+  </div>
+</div>
+
+{% section 'product-guarantee' %}
+
+<div class="wrapper">
+  <div class="grid">
+    <div class="grid__item">
+    {% section 'product-recommendations' %}
+    </div>
+  </div>
+</div>
+
+<script src="https://widget.reviews.io/rich-snippet/dist.js"></script>
+<script>
+    richSnippet({
+    store: 'canvasprints.com',
+    sku: '{{ product.variants | map: "sku" | join: ";" }};{{ product.variants | map: "id" | join: ";" }}',
+  	  /* Your custom Structured Data */
+        data: {
+          "category": {{ product.type | json }},
+          "gtin8": "{{ product.selected_or_first_available_variant.barcode }}",
+          "url": "{{ shop.url }}{{ product.url }}",
+          {% if variant.image %}
+          {% assign variant_image_size = variant.image.width | append: "x" %}
+          "image": "http:{{ variant.image.src | img_url: variant_image_size }}",
+          {% endif %}
+          "description": "{{ product.description | strip_html | strip_newlines | escape }}",
+          "offers": {
+            "type": "Offer",
+            "price": "{{ product.selected_or_first_available_variant.price | money_without_currency | replace : ',', '' }}",
+            "priceCurrency": "{{ shop.currency }}",
+            "url": "{{ shop.url }}{{ product.url }}",
+            "availability": "http://schema.org/{% if product.available %}InStock{% else %}OutOfStock{% endif %}",
+            "priceValidUntil": "{{ 'now' | date: '%s' | plus: 2592000 | date: '%Y-%m-%-d' }}",
+          },
+          "brand": {
+            "type": "Brand",
+            "name": "{{ product.vendor | escape }}",
+          }
+        },
+
+	});
+</script>
+
+<!-- Please Keep For SEO Purposes -->
+<link rel="canonical" href="{{ canonical_url }}" />
+
+
+<!-- Klaviyo browse abandonment flow -->
+<script type="text/javascript">
+  var _learnq = _learnq || [];
+
+  var item = {
+    Name: {{ product.title|json }},
+    ProductID: {{ product.id|json }},
+    Categories: {{ product.collections|map:'title'|json }},
+    ImageURL: "https:{{ product.featured_image.src|img_url:'grande' }}",
+    URL: "{{ shop.secure_url }}{{ product.url }}",
+    Brand: {{ product.vendor|json }},
+    Price: {{ product.price|money|json }},
+    CompareAtPrice: {{ product.compare_at_price_max|money|json }}
+  };
+
+  _learnq.push(['track', 'Viewed Product', item]);
+  _learnq.push(['trackViewedItem', {
+    Title: item.Name,
+    ItemId: item.ProductID,
+    Categories: item.Categories,
+    ImageUrl: item.ImageURL,
+    Url: item.URL,
+    Metadata: {
+      Brand: item.Brand,
+      Price: item.Price,
+      CompareAtPrice: item.CompareAtPrice
+    }
+  }]);
+</script>

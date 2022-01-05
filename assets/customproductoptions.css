@@ -1,0 +1,404 @@
+
+    
+/* --------------------Edit cart popup css------------------- */
+body {font-family: Arial, Helvetica, sans-serif;}
+
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 100; /* Sit on top */
+  padding-top: 60px; /* Location of the box */
+  left: 0;
+  top: 0; 
+  color: black !important;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content */
+.modal-content {
+  position: relative;
+  background-color: #fefefe;
+  margin: auto;
+  padding: 0;
+  border: 1px solid #888;
+  width: 50%;
+  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+  -webkit-animation-name: animatetop;
+  -webkit-animation-duration: 0.4s;
+  animation-name: animatetop;
+  animation-duration: 0.4s
+}
+
+/* Add Animation */
+@-webkit-keyframes animatetop {
+  from {top:-300px; opacity:0} 
+  to {top:0; opacity:1}
+}
+
+@keyframes animatetop {
+  from {top:-300px; opacity:0}
+  to {top:0; opacity:1}
+}
+
+/* The Close Button */
+.close {
+  color: white;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.modal-header {
+  padding: 2px 16px;
+  background-color: #ee1c65;
+  color: white;
+}
+
+.modal-body {padding: 2px 16px;}
+
+.modal-footer {
+  padding: 2px 16px;
+  background-color: #ee1c65;
+  color: white;
+}
+/* ------------------Edit cart popup css End------------------ */
+
+
+/* ------------------PRODUCT PAGE OPTIONS & CART PAGE POPUP CSS------------------ */
+.cart-attribute__field{
+	margin-bottom: 20px;  
+}
+.options-card{
+ 	background-color: #fff;
+    border: 0 none;
+    padding: 10px;
+    margin: 20px 0; 
+}
+.option-name{
+ 	width: 200px;
+    font-size: 14px;
+    letter-spacing: 0;
+    text-align: left;
+    color: #424242;
+    font-weight: bold;
+    display: table-cell;
+    min-width: 200px;
+    padding-right: 15px;
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    vertical-align: top; 
+}
+.option-value{
+ 	width: 100%;
+    text-align: left;
+    display: inherit;
+    vertical-align: top; 
+}
+.option-value input[type='radio'] {
+    display: none;
+}
+/*.option-value label{
+    display: inline-block;
+    background-color: #FFF;
+    font-size: 14px;
+    cursor: pointer;
+    border: 2px solid #eee;
+    padding: 6px 12px;
+  	margin-right: 15px;
+}
+.option-value label:hover{
+  	border: 2px solid #0090FA;
+}
+.option-value input[type="radio"]:checked+label{
+ 	background-color: #0090FA;
+    color: #FFF;
+  	border: 2px solid #0090FA;
+}*/
+.option-value label{
+ 	background-color: #000;
+    color: #FFF;
+    border: none;
+  	width: 50%;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: bold !important;
+    color: #FFF;
+    letter-spacing: 0;
+    font-size: 16px; 
+  	padding: 8px;
+  	margin-right: 30px;
+}
+.option-value label:last-child{
+ 	margin-right: 0px; 
+}
+.option-value label:hover {
+    background-color: #e50085;
+}
+.option-value input[type=radio]:checked+label {
+    background-color: #e50085;
+    color: #fff;
+    border: none;
+}
+.option-value select{
+ 	margin: 0; 
+}
+#insertUpcharge{
+ 	border-radius: 8px;
+    width: 100%;
+    background-color: #ee1b67;
+    font-weight: 300;
+    font-size: 22px;
+    line-height: 38px;
+    padding: 4px 0;
+    min-height: auto;
+    max-width: 300px;
+  	margin-bottom: 10px;
+}
+#your-shopping-cart .qty-section{
+ 	position: relative; 
+}
+#your-shopping-cart .qtyminus,
+#your-shopping-cart .qtyplus{
+ 	position: absolute;
+    z-index: 1;
+    right: 0;
+    width: 30px;
+    height: 21px;
+    border: 1px solid #ddd;
+    padding: 0 10px;
+    line-height: 1;
+  	cursor: pointer;
+}
+#your-shopping-cart .qtyplus{
+    top: 0;
+    height: 22px;
+}
+#your-shopping-cart .qtyminus{
+    bottom: 17px;
+    height: 21px;
+}
+form.cart .edit_cart_option{
+ 	font-size: 14px;
+    text-transform: uppercase;
+    font-weight: 600;
+    line-height: 3.5; 
+}
+.cart__image-preview{
+ 	margin-left: 0; 
+}
+.cart-popup .cart-attribute__field{
+	background: #d8d8d8;
+  	padding: 10px;
+  	margin-bottom: 5px;
+}
+.cart-popup .cart-attribute__field,
+.cart-popup .option-value{
+ 	display: flex !important;
+  	align-items: center;
+}
+.cart-popup .option-name, .cart-popup .option-value{
+	width: 50%;
+}
+.cart-popup .option-value label {
+    background-color: #000;
+    color: #FFF;
+    border: none;
+  	width: 50%;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: bold !important;
+    color: #FFF;
+    letter-spacing: 0;
+    font-size: 16px;
+}
+.cart-popup .option-value label:hover {
+    background-color: #e50085;
+}
+.cart-popup .option-value input[type=radio]:checked+label {
+    background-color: #e50085;
+    color: #fff;
+    border: none;
+}
+.cart-popup .modal-header {
+    padding: 20px 30px;
+    background-color: #FFF;
+    color: #000;
+    text-align: center;
+}
+.cart-popup .modal-body {
+    padding: 10px 30px;
+}
+.cart-popup .modal-footer {
+    padding: 10px 30px 40px;
+    background-color: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.cart-popup .modal-footer button{
+    width: 35%;
+    border-radius: 8px;
+    font-weight: 700;
+}
+.cart-popup .modal-footer .hulkapps_btn_save{
+    border: solid 2px #000;
+  	background-color: #000;
+    color: #FFF;
+}
+.cart-popup .modal-footer .hulkapps_btn_cancel{
+    border: solid 2px #000;
+  	background-color: #FFF;
+    color: #000;
+}
+.cart-popup .modal-footer button:first-child{
+    margin-right: 50px;
+}
+.cart-popup .modal-header h3{
+   	margin: 0;
+}
+.cart-popup .option-value select{
+    border: solid 1px #000;	  
+}
+.cart-popup .option-value select:hover,
+.cart-popup .option-value select:focus{
+    border: solid 1px #000;		
+  	outline: none;
+}
+.product-single .cart-attribute__field,
+.product-single .cart-attribute__field .option-name{
+ 	display: flex; 
+}
+.cod-tooltip{
+ 	margin: 3px 5px;
+  	cursor: pointer;
+  	position: relative;
+    display: inline-block;
+    vertical-align: middle;
+}
+.cod-tooltip img{
+	width: 15px;
+}
+.cod-tooltip:hover .cod-tooltip-inner{
+  	display: block;
+ 	position: absolute;
+    bottom: calc(100% + 5px);
+    background: #000;
+    left: -8px;
+    color: #fff;
+    box-shadow: 0 6px 30px rgb(0 0 0 / 8%);
+    transition: all ease-in-out .5s;
+    border-radius: 5px;
+    font-size: 13px;
+    text-align: center;
+    z-index: 999;
+    white-space: nowrap;
+    padding: 7px;
+}
+.cod-tooltip:hover .cod-tooltip-inner:after{
+ 	content: "";
+    position: absolute;
+    top: 100%;
+    left: 11px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #000 transparent transparent transparent; 
+}
+.selection-add-price{
+ 	border: solid 1px #000; 
+}
+#option_display_total_format{
+	line-height: 1;
+    letter-spacing: 0;  
+}
+.p-10{
+ 	padding: 10px; 
+}
+
+
+@media (max-width: 767px){
+	.option-name{
+     	display: block;
+      	width: 100%;
+      	margin-bottom: 6px;
+    }
+  	.cart-popup .modal-content{
+     	width: 90%;
+      	border: none;
+    }
+  	.cart-popup .modal-header {
+    	padding: 20px 10px 0px;
+  	}
+  	.cart-popup .modal-header h3{
+    	font-size: 16px;
+  	}
+  	.cart-popup .modal-body{
+      	padding: 10px 10px;
+    }
+  	.cart-popup .option-value{
+    	display: block !important;  
+    }
+  	.cart-popup .option-value label{
+     	width: 100%;
+      	font-size: 13px;
+    	padding: 4px;
+    }
+    .cart-popup .option-value label:first-child{
+        margin: 0 0 5px;
+    }
+  	.cart-popup .cart-attribute__field{
+    	padding: 5px;  
+    }
+  	.cart-popup .modal-footer {
+    	padding: 0 10px 10px;
+    }
+  	.cart-popup .modal-footer button {
+    	width: 50%;
+        border-radius: 0;
+        padding: 8px;
+        font-size: 13px;
+    }
+  	.cart-popup .modal-footer button:first-child {
+        margin-right: 0;
+    }
+  	#your-shopping-cart .qtyplus {
+    	top: 40px;
+    }
+  	.template-product.gempage .wrapper{
+     	padding: 0; 
+    }
+  	.product-single .cart-attribute__field{
+     	display: block; 
+    }
+}
+
+/* ------------------PRODUCT PAGE OPTIONS & CART PAGE POPUP CSS END------------------ */
+
+
+#formatted_option_total {
+    color: #ad0000;
+}
+
+#option_total {
+    background: none repeat scroll 0 0 #ffffff;
+    border: 1px solid #000000;
+    color: #000000;
+    padding: 3px 6px;
+}
+
+.cod-tooltip-inner{
+  display:none;
+  
+}

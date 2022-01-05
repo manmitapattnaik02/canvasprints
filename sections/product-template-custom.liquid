@@ -1,0 +1,796 @@
+<style>
+
+  .create_button_text{
+    white-space: pre-wrap;  
+  }
+
+  .wrapper.recommend{
+	padding: 0;
+  }
+  .button_divider{
+    border-top: 1px solid black;
+  }
+  .size_select_title{
+    text-align: center;
+  }
+
+  #AddToCart{
+    background-color: green!important;
+    color: white!important;
+    border: 1px solid green;
+  }
+
+  .button_variant_container{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+
+  }
+
+  form.product-form--wide{
+    margin-left: 0px!important;
+  }
+  .button_variant_selector{
+    margin: 1%;
+    width: 30%;
+    cursor: pointer;
+    background-color: white;
+    color: black;
+    border: 2px solid black;
+    line-height: 40px;
+    text-align: center;
+    font-style: normal;
+    white-space: normal;
+    vertical-align: middle;
+    font-size: 18px;
+    font-weight: 500;
+  }
+
+  .button_variant_selector:hover{
+    background-color: rgb(237, 27, 103, 0.1);
+  }
+
+  .button_variant_selector.selected{
+    background-color: rgb(237, 27, 103);
+    color: white;
+  }
+  .selector-wrapper{
+    display: none!important;
+  }
+  .colored-wrap-info {
+    border-radius: 8px!important;
+    background-color: #f4f4f4!important;
+    padding: 20px;
+  }
+  .half-btn{
+    width: 49%!important;
+    border-radius: 8px;
+    margin-top: 10px;
+  }
+
+  .left-btn{
+    background-color:white;
+    border: 2px solid #ed1b67;
+    color: #ed1b67;
+  }
+  .right-btn{
+    float: right; 
+  }
+  h1{
+    font-size: 25px;
+  }
+  .product-single__photos{
+    margin-bottom: 20px; 
+  }
+
+  .thumbcontainer{
+    width: 23%;
+    display: inline-block;
+  }
+
+  .thumbcontainer img{
+    height: 100px;
+    width: 100px;
+    object-fit: cover;
+    object-position: center;
+
+  }
+  @media screen and (max-width: 768px){
+          .left-btn{
+      height: 75px;
+    }    
+  }
+  @media screen and (min-width: 768px){
+
+    .visible-mob{
+      display: none!important;
+    }
+  }
+  .rte ul, ul.disc{
+    margin-left: 0px!important;
+    list-style: none!important; 
+  }
+  #type_property{
+    display: none;
+  }
+</style>
+<link data-instant-track rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" class="gf-style" />
+<link data-instant-track rel="stylesheet" type="text/css" href="https://d1um8515vdn9kb.cloudfront.net/files/vendor.css?refresh=1" class="gf-style" />
+{%- for tag in customer.tags -%}{%- if tag contains 'ws_group' %}{% assign wholesaler = true %}{%- endif -%}{%- endfor -%}
+
+<div itemscope itemtype="http://schema.org/Product" id="ProductSection" data-section-id="{{ section.id }}" data-section-type="product-template" data-image-zoom-type="{{ section.settings.product_image_zoom_type }}" data-show-extra-tab="{{ section.settings.show_extra_tab }}" data-extra-tab-content="{{ section.settings.extra_tab_content }}" data-enable-history-state="true">
+
+  {% case section.settings.add_to_cart_width %}
+  {% when 'small' %}
+  {%- assign btn_class = 'btn--wide' -%}
+  {%- assign productform_class = 'product-form--wide' -%}
+  {% when 'medium' %}
+  {%- assign btn_class = 'btn--wide' -%}
+  {%- assign productform_class = 'product-form--wide' -%}
+  {% when 'large' %}
+  {%- assign btn_class = 'btn--full' -%}
+  {%- assign productform_class = 'product-form--full' -%}
+  {% endcase %}
+
+  {% if section.settings.add_to_cart_width != 'small' %}
+  <style>
+    @media screen and (min-width: 769px){
+      .single-option-selector,
+      .quantity-selector {
+        {% if section.settings.add_to_cart_width == 'medium' %}
+        min-width: 50%;
+        {% else %}
+        min-width: 100%;
+        {% endif %}
+      }
+    }
+  </style>
+  {% endif %}
+
+  <meta itemprop="url" content="{{ shop.url }}{{ product.url }}">
+  <meta itemprop="image" content="{{ product.featured_image.src | img_url: 'grande' }}">
+
+  <div class="section-header section-header--breadcrumb">
+    {% include 'breadcrumb' %}
+  </div>
+
+  <div class="product-single">
+    <div class="grid product-single__hero">
+      <div class="grid__item post-large--one-half">
+
+        {% if section.settings.product_thumbnails_position == 'below' or product.images.size < 2 %}
+
+        <div class="product-single__photos">
+
+
+          {% assign featured_image = product.selected_variant.featured_image | default: product.featured_image %}
+
+          {% for image in product.images %}
+          {% capture img_id %}ProductImage-{{ image.id }}{% endcapture %}
+          {% capture img_wrapper_id %}ProductImageWrapper-{{ image.id }}{% endcapture %}
+          {%- assign img_url = image | img_url: '1x1' | replace: '_1x1.', '_{width}x.' -%}
+          {% include 'image-style' with image: image, small_style: false, width: 700, height: 1024, wrapper_id: img_wrapper_id, img_id: img_id %}
+
+          <div id="{{ img_wrapper_id }}" class="product-single__image-wrapper supports-js{% unless featured_image == image %} hide{% endunless %}{% if section.settings.product_image_zoom_type == 'lightbox' %} zoom-lightbox{% endif %}" data-image-id="{{ image.id }}">
+            <div style="padding-top:{{ 1 | divided_by: image.aspect_ratio | times: 100}}%;">
+              <img id="{{ img_id }}"
+                   class="product-single__image lazyxload{% unless featured_image == image %} lazyxpreload{% endunless %}"
+                   src="{{ image | img_url: '600x600' }}"
+                   data-src="{{ img_url }}"
+                   data-widths="[180, 370, 540, 740, 900, 1080, 1296, 1512, 1728, 2048]"
+                   data-aspectratio="{{ image.aspect_ratio }}"
+                   data-sizes="auto"
+                   {% if section.settings.product_image_zoom_type == 'zoom-in' %} data-zoom="{{ image | img_url: '1024x1024', scale: 2 }}"{% endif %}
+                   alt="{{ image.alt | escape }}">
+            </div>
+          </div>
+          {% endfor %}
+
+          <noscript>
+            <img src="{{ featured_image | img_url: '1024x1024', scale: 2 }}" alt="{{ featured_image.alt | escape }}">
+          </noscript>
+        </div>
+
+        {% if product.images.size > 1 %}
+
+        <ul style = "margin-left: 0px;" class="product-single__thumbnails grid-uniform" id="ProductThumbs">
+          {% for image in product.images %}
+          {% unless image.attached_to_variant? %}
+          <div class = 'thumbcontainer'>
+            <li class="">
+              <a data-image-id="{{ image.id }}" href="{{ image.src | img_url: '1024x1024' }}" class="product-single__thumbnail">
+                <img src="{{ image.src | img_url: 'grande' }}" alt="{{ image.alt | escape }}">
+              </a>
+            </li>
+          </div>
+          {% endunless %}
+          {% endfor %}
+        </ul>
+
+        {% endif %}
+
+        {% else %}
+
+        <div class="grid">
+
+          <div class="grid__item four-fifths product-single__photos" id="ProductPhoto">
+
+            {% assign featured_image = product.selected_variant.featured_image | default: product.featured_image %}
+
+            {% for image in product.images %}
+            {% capture img_id %}ProductImage-{{ image.id }}{% endcapture %}
+            {% capture img_wrapper_id %}ProductImageWrapper-{{ image.id }}{% endcapture %}
+            {%- assign img_url = image | img_url: '1x1' | replace: '_1x1.', '_{width}x.' -%}
+            {% include 'image-style' with image: image, small_style: false, width: 700, height: 1024, wrapper_id: img_wrapper_id, img_id: img_id %}
+
+            <div id="{{ img_wrapper_id }}" class="product-single__image-wrapper supports-js{% unless featured_image == image %} hide{% endunless %}{% if section.settings.product_image_zoom_type == 'lightbox' %} zoom-lightbox{% endif %}" data-image-id="{{ image.id }}">
+              <div style="padding-top:{{ 1 | divided_by: image.aspect_ratio | times: 100}}%;">
+                <img id="{{ img_id }}"
+                     class="product-single__image lazyxload{% unless featured_image == image %} lazyxpreload{% endunless %}"
+                     src="{{ image | img_url: '600x600' }}"
+                     data-src="{{ img_url }}"
+                     data-widths="[180, 370, 540, 740, 900, 1080, 1296, 1512, 1728, 2048]"
+                     data-aspectratio="{{ image.aspect_ratio }}"
+                     data-sizes="auto"
+                     {% if section.settings.product_image_zoom_type == 'zoom-in' %} data-zoom="{{ image | img_url: '1024x1024', scale: 2 }}"{% endif %}
+                     alt="{{ image.alt | escape }}">
+              </div>
+            </div>
+            {% else %}
+            <img src="{{ featured_image | img_url: '1024x1024', scale: 2 }}" alt="{{ featured_image.alt | escape }}">
+            {% endfor %}
+
+            <noscript>
+              <img src="{{ featured_image | img_url: '1024x1024', scale: 2 }}" alt="{{ featured_image.alt | escape }}">
+            </noscript>
+          </div>
+
+          <div class="grid__item one-fifth">
+
+            <ul class="grid product-single__thumbnails" id="ProductThumbs">
+              {% for image in product.images %}
+              <li class="grid__item">
+                <a data-image-id="{{ image.id }}" href="{{ image.src | img_url: '1024x1024' }}" class="product-single__thumbnail">
+                  <img src="{{ image.src | img_url: 'grande' }}" alt="{{ image.alt | escape }}">
+                </a>
+              </li>
+              {% endfor %}
+            </ul>
+
+          </div>
+
+        </div>
+
+        {% endif %}
+
+
+      </div>
+      <div class="grid__item post-large--one-half">
+        {% if section.settings.product_vendor_enable %}
+        <span class="h3" itemprop="brand">{{ product.vendor }}</span>
+        {% endif %}
+        <div class = "visible-mob">
+          <button onclick = "press_atc()"class = "left-btn btn half-btn {{ btn_class }}{% if section.settings.enable_payment_button %}{% endif %}">
+            <span id = "AddToCartTextMobile">{{ 'products.product.add_to_cart' | t }}</span>
+          </button>
+          <a href = '/products/customize-your-canvas'>
+            <button class="btn {{ btn_class }} half-btn right-btn">
+              <span class = 'create_button_text'><strong>OR</strong> Create Your Own Canvas</span>
+            </button>
+          </a>
+        </div>
+
+        <div class="colored-wrap-info">
+          <h1 itemprop="name">{{ product.title }}</h1>
+          <p class="product-ratings"><!--StartFragment--><strong><span class="Aq14fc" aria-hidden="true" style="white-space: nowrap; font-family: Roboto, arial, sans-serif; font-size: 20px; letter-spacing: normal; margin-right: 5px;">4.8</span><g-review-stars style="color: rgb(0, 0, 0); font-family: Roboto, arial, sans-serif; font-size: 20px; letter-spacing: normal;"><span class="Fam1ne EBe2gf" aria-label="Rated 4.7 out of 5," style="background-repeat: repeat-x; display: inline-block; overflow: hidden; position: relative; background-image: url(&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAANCAQAAAAz1Zf0AAAAWklEQVR4AY3O0QbDQBCG0UNYQi0hhBJqr8Iy7/94vewYlp65/Ay//4WlLnQLt3BbeIRH5jBFPVMHmlHS0CRnSqdiT3GH1edb8RGmoy4GwrBhM4Qmebn8XDrwBW7xChrojlOZAAAAAElFTkSuQmCC&quot;); background-size: 14px 13px; height: 13px; top: 1px; width: 69px;"><span style="background-repeat: repeat-x; display: block; background-image: url(&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAANCAYAAACZ3F9/AAAAZklEQVR4AWL4uYWZCdAJHVMBAIJAAG1DoAtjGarYxxjqwHADnA8HFuWL3E8puH8gAqILPaB34Qq4FAQ1yoo+8ES7NRWKe6u+Ogo0XjtaCmlSd6K/4OQQOF0JKYTsMasgOIRkBfDZATita/85jgoHAAAAAElFTkSuQmCC&quot;); background-size: 14px 13px; height: 13px; top: 1px; width: 63px;"></span></span></g-review-stars><font face="Roboto, arial, sans-serif"><span style="font-size: 14px; letter-spacing: normal; white-space: nowrap;">&nbsp;on Google</span></font></strong></p>
+          <div class="product-single__prices{% if shop.taxes_included or shop.shipping_policy.body != blank %} product-single__prices--policy-enabled{% endif %}">
+            <span id="PriceA11y" class="visually-hidden">{{ 'products.product.regular_price' | t }}</span>
+            {%- capture wsprice -%}{% include 'ws-item-price', item: product, money: false %}{%- endcapture -%}{%- assign wsprice = wsprice | plus: 0 -%}
+            <span id="ProductPrice" class="product-single__price" itemprop="price" content="{{ wsprice | divided_by: 100.00 }}">
+              {{ wsprice | money }}
+            </span>
+
+          </div>
+          <div class="product-description rte" itemprop="description">
+            {{ product.description }}
+          </div>
+          <div itemprop="offers" itemscope itemtype="http://schema.org/Offer">
+            {% assign variant = product.selected_variant %}
+
+            <meta itemprop="priceCurrency" content="{{ shop.currency }}">
+            <link itemprop="availability" href="http://schema.org/{% if product.available %}InStock{% else %}OutOfStock{% endif %}">
+
+
+
+            {% form 'product', product, class:productform_class %}
+            <select name="id" id="ProductSelect-{{ section.id }}" class="product-single__variants">
+              {% for variant in product.variants %}
+              {% if variant.available %}
+
+              <option data-sku="{{ variant.sku }}" value="{{ variant.id }}">{{ variant.title }} - {{ variant.price | money_with_currency }}</option>
+
+              {% else %}
+              <option disabled="disabled">
+                {{ variant.title }} - {{ 'products.product.sold_out' | t }}
+              </option>
+              {% endif %}
+              {% endfor %}  
+            </select>
+            <div class = 'size_select_title' ><strong>Select your size</strong></div>
+            <div class = 'button_variant_container'>
+
+              {% for variant in product.variants %}
+              {% if variant.available %}
+              <div id = '{{variant.id}}' class = 'button_variant_selector'>
+                <span>
+                  {{ variant.title }}
+                </span>
+              </div>
+              {% endif %}
+              {% endfor %}
+            </div>
+            <hr class = 'button_divider'>
+            <div class="product-single__quantity{% unless section.settings.product_quantity_enable %} is-hidden{% endunless %}">
+              <label for="Quantity">{{ 'products.product.quantity' | t }}</label>
+              <input type="number" id="Quantity" name="quantity" value="1" min="1" class="quantity-selector">
+            </div>
+            <input id = 'type_property' type = 'text' name="properties[_Type]" value = "Static">
+            
+            <p class="line-item-property__field">
+              <label>Choose border Type</label><br>
+              <input required type="radio" name="properties[border]" value="Blur"> <span>Blur</span><br>
+              <input required type="radio" name="properties[border]" value="Mirror"> <span>Mirror</span><br>
+              <input required type="radio" name="properties[border]" value="White"> <span>White</span><br>
+            </p>
+            
+            <button type="submit" name="add" id="AddToCart" class="left-btn btn half-btn {{ btn_class }}{% if section.settings.enable_payment_button %}{% endif %}">
+              <span id = "AddToCartText">{{ 'products.product.add_to_cart' | t }}</span>
+            </button>
+            <a href = '/products/customize-your-canvas'>
+              <button class="btn {{ btn_class }} half-btn right-btn">
+                <span class = 'create_button_text'><strong>OR</strong> Create Your Own Canvas</span>
+              </button>
+            </a>
+
+            {% endform %}
+            {% include 'banana-stand-product-page-container' %}
+
+
+
+
+
+            {% if section.settings.social_sharing %}
+            <hr class="hr--clear hr--small">
+            <h2 class="h4">{{ 'products.general.share_title' | t }}</h2>
+            {% include 'social-sharing' %}
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="payment-ico">
+          <ul class="inline-list payment-icons">
+
+            <li>
+              <svg class="icon" xmlns="http://www.w3.org/2000/svg" role="img" viewBox="0 0 38 24" width="38" height="24" aria-labelledby="pi-american_express"><title id="pi-american_express">American Express</title><g fill="none"><path fill="#000" d="M35,0 L3,0 C1.3,0 0,1.3 0,3 L0,21 C0,22.7 1.4,24 3,24 L35,24 C36.7,24 38,22.7 38,21 L38,3 C38,1.3 36.6,0 35,0 Z" opacity=".07"></path><path fill="#006FCF" d="M35,1 C36.1,1 37,1.9 37,3 L37,21 C37,22.1 36.1,23 35,23 L3,23 C1.9,23 1,22.1 1,21 L1,3 C1,1.9 1.9,1 3,1 L35,1"></path><path fill="#FFF" d="M8.971,10.268 L9.745,12.144 L8.203,12.144 L8.971,10.268 Z M25.046,10.346 L22.069,10.346 L22.069,11.173 L24.998,11.173 L24.998,12.412 L22.075,12.412 L22.075,13.334 L25.052,13.334 L25.052,14.073 L27.129,11.828 L25.052,9.488 L25.046,10.346 L25.046,10.346 Z M10.983,8.006 L14.978,8.006 L15.865,9.941 L16.687,8 L27.057,8 L28.135,9.19 L29.25,8 L34.013,8 L30.494,11.852 L33.977,15.68 L29.143,15.68 L28.065,14.49 L26.94,15.68 L10.03,15.68 L9.536,14.49 L8.406,14.49 L7.911,15.68 L4,15.68 L7.286,8 L10.716,8 L10.983,8.006 Z M19.646,9.084 L17.407,9.084 L15.907,12.62 L14.282,9.084 L12.06,9.084 L12.06,13.894 L10,9.084 L8.007,9.084 L5.625,14.596 L7.18,14.596 L7.674,13.406 L10.27,13.406 L10.764,14.596 L13.484,14.596 L13.484,10.661 L15.235,14.602 L16.425,14.602 L18.165,10.673 L18.165,14.603 L19.623,14.603 L19.647,9.083 L19.646,9.084 Z M28.986,11.852 L31.517,9.084 L29.695,9.084 L28.094,10.81 L26.546,9.084 L20.652,9.084 L20.652,14.602 L26.462,14.602 L28.076,12.864 L29.624,14.602 L31.499,14.602 L28.987,11.852 L28.986,11.852 Z"></path></g></svg>
+
+            </li>
+
+            <li>
+              <svg class="icon" version="1.1" xmlns="http://www.w3.org/2000/svg" role="img" x="0" y="0" width="38" height="24" viewBox="0 0 165.521 105.965" xml:space="preserve" aria-labelledby="pi-apple_pay"><title id="pi-apple_pay">Apple Pay</title><path fill="#000" d="M150.698 0H14.823c-.566 0-1.133 0-1.698.003-.477.004-.953.009-1.43.022-1.039.028-2.087.09-3.113.274a10.51 10.51 0 0 0-2.958.975 9.932 9.932 0 0 0-4.35 4.35 10.463 10.463 0 0 0-.975 2.96C.113 9.611.052 10.658.024 11.696a70.22 70.22 0 0 0-.022 1.43C0 13.69 0 14.256 0 14.823v76.318c0 .567 0 1.132.002 1.699.003.476.009.953.022 1.43.028 1.036.09 2.084.275 3.11a10.46 10.46 0 0 0 .974 2.96 9.897 9.897 0 0 0 1.83 2.52 9.874 9.874 0 0 0 2.52 1.83c.947.483 1.917.79 2.96.977 1.025.183 2.073.245 3.112.273.477.011.953.017 1.43.02.565.004 1.132.004 1.698.004h135.875c.565 0 1.132 0 1.697-.004.476-.002.952-.009 1.431-.02 1.037-.028 2.085-.09 3.113-.273a10.478 10.478 0 0 0 2.958-.977 9.955 9.955 0 0 0 4.35-4.35c.483-.947.789-1.917.974-2.96.186-1.026.246-2.074.274-3.11.013-.477.02-.954.022-1.43.004-.567.004-1.132.004-1.699V14.824c0-.567 0-1.133-.004-1.699a63.067 63.067 0 0 0-.022-1.429c-.028-1.038-.088-2.085-.274-3.112a10.4 10.4 0 0 0-.974-2.96 9.94 9.94 0 0 0-4.35-4.35A10.52 10.52 0 0 0 156.939.3c-1.028-.185-2.076-.246-3.113-.274a71.417 71.417 0 0 0-1.431-.022C151.83 0 151.263 0 150.698 0z"></path><path fill="#FFF" d="M150.698 3.532l1.672.003c.452.003.905.008 1.36.02.793.022 1.719.065 2.583.22.75.135 1.38.34 1.984.648a6.392 6.392 0 0 1 2.804 2.807c.306.6.51 1.226.645 1.983.154.854.197 1.783.218 2.58.013.45.019.9.02 1.36.005.557.005 1.113.005 1.671v76.318c0 .558 0 1.114-.004 1.682-.002.45-.008.9-.02 1.35-.022.796-.065 1.725-.221 2.589a6.855 6.855 0 0 1-.645 1.975 6.397 6.397 0 0 1-2.808 2.807c-.6.306-1.228.511-1.971.645-.881.157-1.847.2-2.574.22-.457.01-.912.017-1.379.019-.555.004-1.113.004-1.669.004H14.801c-.55 0-1.1 0-1.66-.004a74.993 74.993 0 0 1-1.35-.018c-.744-.02-1.71-.064-2.584-.22a6.938 6.938 0 0 1-1.986-.65 6.337 6.337 0 0 1-1.622-1.18 6.355 6.355 0 0 1-1.178-1.623 6.935 6.935 0 0 1-.646-1.985c-.156-.863-.2-1.788-.22-2.578a66.088 66.088 0 0 1-.02-1.355l-.003-1.327V14.474l.002-1.325a66.7 66.7 0 0 1 .02-1.357c.022-.792.065-1.717.222-2.587a6.924 6.924 0 0 1 .646-1.981c.304-.598.7-1.144 1.18-1.623a6.386 6.386 0 0 1 1.624-1.18 6.96 6.96 0 0 1 1.98-.646c.865-.155 1.792-.198 2.586-.22.452-.012.905-.017 1.354-.02l1.677-.003h135.875"></path><g><g><path fill="#000" d="M43.508 35.77c1.404-1.755 2.356-4.112 2.105-6.52-2.054.102-4.56 1.355-6.012 3.112-1.303 1.504-2.456 3.959-2.156 6.266 2.306.2 4.61-1.152 6.063-2.858"></path><path fill="#000" d="M45.587 39.079c-3.35-.2-6.196 1.9-7.795 1.9-1.6 0-4.049-1.8-6.698-1.751-3.447.05-6.645 2-8.395 5.1-3.598 6.2-.95 15.4 2.55 20.45 1.699 2.5 3.747 5.25 6.445 5.151 2.55-.1 3.549-1.65 6.647-1.65 3.097 0 3.997 1.65 6.696 1.6 2.798-.05 4.548-2.5 6.247-5 1.95-2.85 2.747-5.6 2.797-5.75-.05-.05-5.396-2.101-5.446-8.251-.05-5.15 4.198-7.6 4.398-7.751-2.399-3.548-6.147-3.948-7.447-4.048"></path></g><g><path fill="#000" d="M78.973 32.11c7.278 0 12.347 5.017 12.347 12.321 0 7.33-5.173 12.373-12.529 12.373h-8.058V69.62h-5.822V32.11h14.062zm-8.24 19.807h6.68c5.07 0 7.954-2.729 7.954-7.46 0-4.73-2.885-7.434-7.928-7.434h-6.706v14.894z"></path><path fill="#000" d="M92.764 61.847c0-4.809 3.665-7.564 10.423-7.98l7.252-.442v-2.08c0-3.04-2.001-4.704-5.562-4.704-2.938 0-5.07 1.507-5.51 3.82h-5.252c.157-4.86 4.731-8.395 10.918-8.395 6.654 0 10.995 3.483 10.995 8.89v18.663h-5.38v-4.497h-.13c-1.534 2.937-4.914 4.782-8.579 4.782-5.406 0-9.175-3.222-9.175-8.057zm17.675-2.417v-2.106l-6.472.416c-3.64.234-5.536 1.585-5.536 3.95 0 2.288 1.975 3.77 5.068 3.77 3.95 0 6.94-2.522 6.94-6.03z"></path><path fill="#000" d="M120.975 79.652v-4.496c.364.051 1.247.103 1.715.103 2.573 0 4.029-1.09 4.913-3.899l.52-1.663-9.852-27.293h6.082l6.863 22.146h.13l6.862-22.146h5.927l-10.216 28.67c-2.34 6.577-5.017 8.735-10.683 8.735-.442 0-1.872-.052-2.261-.157z"></path></g></g></svg>
+
+            </li>
+
+            <li>
+              <svg class="icon" viewBox="0 0 38 24" xmlns="http://www.w3.org/2000/svg" role="img" width="38" height="24" aria-labelledby="pi-diners_club"><title id="pi-diners_club">Diners Club</title><path opacity=".07" d="M35 0H3C1.3 0 0 1.3 0 3v18c0 1.7 1.4 3 3 3h32c1.7 0 3-1.3 3-3V3c0-1.7-1.4-3-3-3z"></path><path fill="#fff" d="M35 1c1.1 0 2 .9 2 2v18c0 1.1-.9 2-2 2H3c-1.1 0-2-.9-2-2V3c0-1.1.9-2 2-2h32"></path><path d="M12 12v3.7c0 .3-.2.3-.5.2-1.9-.8-3-3.3-2.3-5.4.4-1.1 1.2-2 2.3-2.4.4-.2.5-.1.5.2V12zm2 0V8.3c0-.3 0-.3.3-.2 2.1.8 3.2 3.3 2.4 5.4-.4 1.1-1.2 2-2.3 2.4-.4.2-.4.1-.4-.2V12zm7.2-7H13c3.8 0 6.8 3.1 6.8 7s-3 7-6.8 7h8.2c3.8 0 6.8-3.1 6.8-7s-3-7-6.8-7z" fill="#3086C8"></path></svg>
+            </li>
+
+            <li>
+              <svg class="icon" viewBox="0 0 38 24" width="38" height="24" role="img" aria-labelledby="pi-discover" fill="none" xmlns="http://www.w3.org/2000/svg"><title id="pi-discover">Discover</title><path fill="#000" opacity=".07" d="M35 0H3C1.3 0 0 1.3 0 3v18c0 1.7 1.4 3 3 3h32c1.7 0 3-1.3 3-3V3c0-1.7-1.4-3-3-3z"></path><path d="M35 1c1.1 0 2 .9 2 2v18c0 1.1-.9 2-2 2H3c-1.1 0-2-.9-2-2V3c0-1.1.9-2 2-2h32z" fill="#fff"></path><path d="M3.57 7.16H2v5.5h1.57c.83 0 1.43-.2 1.96-.63.63-.52 1-1.3 1-2.11-.01-1.63-1.22-2.76-2.96-2.76zm1.26 4.14c-.34.3-.77.44-1.47.44h-.29V8.1h.29c.69 0 1.11.12 1.47.44.37.33.59.84.59 1.37 0 .53-.22 1.06-.59 1.39zm2.19-4.14h1.07v5.5H7.02v-5.5zm3.69 2.11c-.64-.24-.83-.4-.83-.69 0-.35.34-.61.8-.61.32 0 .59.13.86.45l.56-.73c-.46-.4-1.01-.61-1.62-.61-.97 0-1.72.68-1.72 1.58 0 .76.35 1.15 1.35 1.51.42.15.63.25.74.31.21.14.32.34.32.57 0 .45-.35.78-.83.78-.51 0-.92-.26-1.17-.73l-.69.67c.49.73 1.09 1.05 1.9 1.05 1.11 0 1.9-.74 1.9-1.81.02-.89-.35-1.29-1.57-1.74zm1.92.65c0 1.62 1.27 2.87 2.9 2.87.46 0 .86-.09 1.34-.32v-1.26c-.43.43-.81.6-1.29.6-1.08 0-1.85-.78-1.85-1.9 0-1.06.79-1.89 1.8-1.89.51 0 .9.18 1.34.62V7.38c-.47-.24-.86-.34-1.32-.34-1.61 0-2.92 1.28-2.92 2.88zm12.76.94l-1.47-3.7h-1.17l2.33 5.64h.58l2.37-5.64h-1.16l-1.48 3.7zm3.13 1.8h3.04v-.93h-1.97v-1.48h1.9v-.93h-1.9V8.1h1.97v-.94h-3.04v5.5zm7.29-3.87c0-1.03-.71-1.62-1.95-1.62h-1.59v5.5h1.07v-2.21h.14l1.48 2.21h1.32l-1.73-2.32c.81-.17 1.26-.72 1.26-1.56zm-2.16.91h-.31V8.03h.33c.67 0 1.03.28 1.03.82 0 .55-.36.85-1.05.85z" fill="#231F20"></path><path d="M20.16 12.86a2.931 2.931 0 100-5.862 2.931 2.931 0 000 5.862z" fill="url(#pi-paint0_linear)"></path><path opacity=".65" d="M20.16 12.86a2.931 2.931 0 100-5.862 2.931 2.931 0 000 5.862z" fill="url(#pi-paint1_linear)"></path><path d="M36.57 7.506c0-.1-.07-.15-.18-.15h-.16v.48h.12v-.19l.14.19h.14l-.16-.2c.06-.01.1-.06.1-.13zm-.2.07h-.02v-.13h.02c.06 0 .09.02.09.06 0 .05-.03.07-.09.07z" fill="#231F20"></path><path d="M36.41 7.176c-.23 0-.42.19-.42.42 0 .23.19.42.42.42.23 0 .42-.19.42-.42 0-.23-.19-.42-.42-.42zm0 .77c-.18 0-.34-.15-.34-.35 0-.19.15-.35.34-.35.18 0 .33.16.33.35 0 .19-.15.35-.33.35z" fill="#231F20"></path><path d="M37 12.984S27.09 19.873 8.976 23h26.023a2 2 0 002-1.984l.024-3.02L37 12.985z" fill="#F48120"></path><defs><linearGradient id="pi-paint0_linear" x1="21.657" y1="12.275" x2="19.632" y2="9.104" gradientUnits="userSpaceOnUse"><stop stop-color="#F89F20"></stop><stop offset=".25" stop-color="#F79A20"></stop><stop offset=".533" stop-color="#F68D20"></stop><stop offset=".62" stop-color="#F58720"></stop><stop offset=".723" stop-color="#F48120"></stop><stop offset="1" stop-color="#F37521"></stop></linearGradient><linearGradient id="pi-paint1_linear" x1="21.338" y1="12.232" x2="18.378" y2="6.446" gradientUnits="userSpaceOnUse"><stop stop-color="#F58720"></stop><stop offset=".359" stop-color="#E16F27"></stop><stop offset=".703" stop-color="#D4602C"></stop><stop offset=".982" stop-color="#D05B2E"></stop></linearGradient></defs></svg>
+            </li>
+
+            <li>
+              <svg class="icon" xmlns="http://www.w3.org/2000/svg" role="img" viewBox="0 0 38 24" width="38" height="24" aria-labelledby="pi-google_pay"><title id="pi-google_pay">Google Pay</title><path d="M35 0H3C1.3 0 0 1.3 0 3v18c0 1.7 1.4 3 3 3h32c1.7 0 3-1.3 3-3V3c0-1.7-1.4-3-3-3z" fill="#000" opacity=".07"></path><path d="M35 1c1.1 0 2 .9 2 2v18c0 1.1-.9 2-2 2H3c-1.1 0-2-.9-2-2V3c0-1.1.9-2 2-2h32" fill="#FFF"></path><path d="M18.093 11.976v3.2h-1.018v-7.9h2.691a2.447 2.447 0 0 1 1.747.692 2.28 2.28 0 0 1 .11 3.224l-.11.116c-.47.447-1.098.69-1.747.674l-1.673-.006zm0-3.732v2.788h1.698c.377.012.741-.135 1.005-.404a1.391 1.391 0 0 0-1.005-2.354l-1.698-.03zm6.484 1.348c.65-.03 1.286.188 1.778.613.445.43.682 1.03.65 1.649v3.334h-.969v-.766h-.049a1.93 1.93 0 0 1-1.673.931 2.17 2.17 0 0 1-1.496-.533 1.667 1.667 0 0 1-.613-1.324 1.606 1.606 0 0 1 .613-1.336 2.746 2.746 0 0 1 1.698-.515c.517-.02 1.03.093 1.49.331v-.208a1.134 1.134 0 0 0-.417-.901 1.416 1.416 0 0 0-.98-.368 1.545 1.545 0 0 0-1.319.717l-.895-.564a2.488 2.488 0 0 1 2.182-1.06zM23.29 13.52a.79.79 0 0 0 .337.662c.223.176.5.269.785.263.429-.001.84-.17 1.146-.472.305-.286.478-.685.478-1.103a2.047 2.047 0 0 0-1.324-.374 1.716 1.716 0 0 0-1.03.294.883.883 0 0 0-.392.73zm9.286-3.75l-3.39 7.79h-1.048l1.281-2.728-2.224-5.062h1.103l1.612 3.885 1.569-3.885h1.097z" fill="#5F6368"></path><path d="M13.986 11.284c0-.308-.024-.616-.073-.92h-4.29v1.747h2.451a2.096 2.096 0 0 1-.9 1.373v1.134h1.464a4.433 4.433 0 0 0 1.348-3.334z" fill="#4285F4"></path><path d="M9.629 15.721a4.352 4.352 0 0 0 3.01-1.097l-1.466-1.14a2.752 2.752 0 0 1-4.094-1.44H5.577v1.17a4.53 4.53 0 0 0 4.052 2.507z" fill="#34A853"></path><path d="M7.079 12.05a2.709 2.709 0 0 1 0-1.735v-1.17H5.577a4.505 4.505 0 0 0 0 4.075l1.502-1.17z" fill="#FBBC04"></path><path d="M9.629 8.44a2.452 2.452 0 0 1 1.74.68l1.3-1.293a4.37 4.37 0 0 0-3.065-1.183 4.53 4.53 0 0 0-4.027 2.5l1.502 1.171a2.715 2.715 0 0 1 2.55-1.875z" fill="#EA4335"></path></svg>
+
+            </li>
+
+            <li>
+              <svg class="icon" width="38" height="24" role="img" aria-labelledby="pi-jcb" viewBox="0 0 38 24" xmlns="http://www.w3.org/2000/svg"><title id="pi-jcb">JCB</title><g fill="none" fill-rule="evenodd"><g fill-rule="nonzero"><path d="M35 0H3C1.3 0 0 1.3 0 3v18c0 1.7 1.4 3 3 3h32c1.7 0 3-1.3 3-3V3c0-1.7-1.4-3-3-3z" fill="#000" opacity=".07"></path><path d="M35 1c1.1 0 2 .9 2 2v18c0 1.1-.9 2-2 2H3c-1.1 0-2-.9-2-2V3c0-1.1.9-2 2-2h32" fill="#FFF"></path></g><path d="M11.5 5H15v11.5a2.5 2.5 0 0 1-2.5 2.5H9V7.5A2.5 2.5 0 0 1 11.5 5z" fill="#006EBC"></path><path d="M18.5 5H22v11.5a2.5 2.5 0 0 1-2.5 2.5H16V7.5A2.5 2.5 0 0 1 18.5 5z" fill="#F00036"></path><path d="M25.5 5H29v11.5a2.5 2.5 0 0 1-2.5 2.5H23V7.5A2.5 2.5 0 0 1 25.5 5z" fill="#2AB419"></path><path d="M10.755 14.5c-1.06 0-2.122-.304-2.656-.987l.78-.676c.068 1.133 3.545 1.24 3.545-.19V9.5h1.802v3.147c0 .728-.574 1.322-1.573 1.632-.466.144-1.365.221-1.898.221zm8.116 0c-.674 0-1.388-.107-1.965-.366-.948-.425-1.312-1.206-1.3-2.199.012-1.014.436-1.782 1.468-2.165 1.319-.49 3.343-.261 3.926.27v.972c-.572-.521-1.958-.898-2.919-.46-.494.226-.737.917-.744 1.448-.006.56.245 1.252.744 1.497.953.467 2.39.04 2.919-.441v1.01c-.358.255-1.253.434-2.129.434zm8.679-2.587c.37-.235.582-.567.582-1.005 0-.438-.116-.687-.348-.939-.206-.207-.58-.469-1.238-.469H23v5h3.546c.696 0 1.097-.23 1.315-.415.283-.25.426-.53.426-.96 0-.431-.155-.908-.737-1.212zm-1.906-.281h-1.428v-1.444h1.495c.956 0 .944 1.444-.067 1.444zm.288 2.157h-1.716v-1.513h1.716c.986 0 1.083 1.513 0 1.513z" fill="#FFF" fill-rule="nonzero"></path></g></svg>
+            </li>
+
+            <li>
+              <svg class="icon" viewBox="0 0 38 24" xmlns="http://www.w3.org/2000/svg" role="img" width="38" height="24" aria-labelledby="pi-master"><title id="pi-master">Mastercard</title><path opacity=".07" d="M35 0H3C1.3 0 0 1.3 0 3v18c0 1.7 1.4 3 3 3h32c1.7 0 3-1.3 3-3V3c0-1.7-1.4-3-3-3z"></path><path fill="#fff" d="M35 1c1.1 0 2 .9 2 2v18c0 1.1-.9 2-2 2H3c-1.1 0-2-.9-2-2V3c0-1.1.9-2 2-2h32"></path><circle fill="#EB001B" cx="15" cy="12" r="7"></circle><circle fill="#F79E1B" cx="23" cy="12" r="7"></circle><path fill="#FF5F00" d="M22 12c0-2.4-1.2-4.5-3-5.7-1.8 1.3-3 3.4-3 5.7s1.2 4.5 3 5.7c1.8-1.2 3-3.3 3-5.7z"></path></svg>
+            </li>
+
+            <li>
+              <svg class="icon" xmlns="http://www.w3.org/2000/svg" role="img" viewBox="0 0 38 24" width="38" height="24" aria-labelledby="pi-shopify_pay"><title id="pi-shopify_pay">Shop Pay</title><path opacity=".07" d="M35 0H3C1.3 0 0 1.3 0 3v18c0 1.7 1.4 3 3 3h32c1.7 0 3-1.3 3-3V3c0-1.7-1.4-3-3-3z" fill="#000"></path><path d="M35 1c1.1 0 2 .9 2 2v18c0 1.1-.9 2-2 2H3c-1.1 0-2-.9-2-2V3c0-1.1.9-2 2-2h32z" fill="#5A31F4"></path><path d="M21.382 9.713c0 1.668-1.177 2.858-2.821 2.858h-1.549a.133.133 0 00-.12.08.127.127 0 00-.01.049v2.192a.129.129 0 01-.13.129h-1.084a.13.13 0 01-.13-.13V6.986a.127.127 0 01.08-.12.129.129 0 01.05-.01h2.9c1.637 0 2.814 1.19 2.814 2.858v-.001zm-1.352 0c0-.958-.658-1.658-1.55-1.658h-1.468a.13.13 0 00-.13.13v3.05a.127.127 0 00.038.092.129.129 0 00.092.038h1.468c.892.005 1.55-.695 1.55-1.652zm1.674 3.791a1.527 1.527 0 01.647-1.317c.423-.316 1.084-.48 2.055-.514l1.033-.036v-.303c0-.607-.41-.863-1.068-.863-.658 0-1.075.231-1.17.61a.127.127 0 01-.125.09h-1.022a.13.13 0 01-.126-.092.125.125 0 01-.004-.055c.152-.898.904-1.58 2.494-1.58 1.692 0 2.303.783 2.303 2.276v3.172a.13.13 0 01-.132.129h-1.03a.13.13 0 01-.13-.13v-.236a.096.096 0 00-.061-.091.1.1 0 00-.107.022c-.31.334-.808.575-1.607.575-1.175 0-1.95-.607-1.95-1.657zm3.735-.687v-.246l-1.339.07c-.705.036-1.115.326-1.115.816 0 .444.376.69 1.034.69.893 0 1.42-.48 1.42-1.33zm2.316 4.6v-.919a.13.13 0 01.049-.1.132.132 0 01.108-.027c.158.029.318.044.479.044a1.229 1.229 0 001.245-.876l.067-.211a.133.133 0 000-.088l-2.145-5.471a.13.13 0 01.06-.165.13.13 0 01.062-.015h1.04a.132.132 0 01.123.085l1.456 3.859a.131.131 0 00.125.088.133.133 0 00.125-.088l1.265-3.848a.13.13 0 01.126-.09h1.076a.134.134 0 01.132.116.134.134 0 01-.008.063l-2.295 6.076c-.528 1.413-1.433 1.773-2.43 1.773a1.959 1.959 0 01-.561-.066.132.132 0 01-.1-.14h.001zM8.57 6.4a5.363 5.363 0 00-3.683 1.427.231.231 0 00-.029.31l.618.839a.236.236 0 00.362.028 3.823 3.823 0 012.738-1.11c2.12 0 3.227 1.584 3.227 3.15 0 1.7-1.163 2.898-2.835 2.921-1.292 0-2.266-.85-2.266-1.974a1.908 1.908 0 01.713-1.48.231.231 0 00.033-.324l-.65-.815a.236.236 0 00-.339-.034 3.43 3.43 0 00-.942 1.183 3.39 3.39 0 00-.337 1.47c0 1.935 1.655 3.452 3.775 3.464h.03c2.517-.032 4.337-1.884 4.337-4.415 0-2.247-1.667-4.64-4.752-4.64z" fill="#fff"></path></svg>
+            </li>
+
+            <li>
+              <svg class="icon" viewBox="0 0 38 24" xmlns="http://www.w3.org/2000/svg" role="img" width="38" height="24" aria-labelledby="pi-visa"><title id="pi-visa">Visa</title><path opacity=".07" d="M35 0H3C1.3 0 0 1.3 0 3v18c0 1.7 1.4 3 3 3h32c1.7 0 3-1.3 3-3V3c0-1.7-1.4-3-3-3z"></path><path fill="#fff" d="M35 1c1.1 0 2 .9 2 2v18c0 1.1-.9 2-2 2H3c-1.1 0-2-.9-2-2V3c0-1.1.9-2 2-2h32"></path><path d="M28.3 10.1H28c-.4 1-.7 1.5-1 3h1.9c-.3-1.5-.3-2.2-.6-3zm2.9 5.9h-1.7c-.1 0-.1 0-.2-.1l-.2-.9-.1-.2h-2.4c-.1 0-.2 0-.2.2l-.3.9c0 .1-.1.1-.1.1h-2.1l.2-.5L27 8.7c0-.5.3-.7.8-.7h1.5c.1 0 .2 0 .2.2l1.4 6.5c.1.4.2.7.2 1.1.1.1.1.1.1.2zm-13.4-.3l.4-1.8c.1 0 .2.1.2.1.7.3 1.4.5 2.1.4.2 0 .5-.1.7-.2.5-.2.5-.7.1-1.1-.2-.2-.5-.3-.8-.5-.4-.2-.8-.4-1.1-.7-1.2-1-.8-2.4-.1-3.1.6-.4.9-.8 1.7-.8 1.2 0 2.5 0 3.1.2h.1c-.1.6-.2 1.1-.4 1.7-.5-.2-1-.4-1.5-.4-.3 0-.6 0-.9.1-.2 0-.3.1-.4.2-.2.2-.2.5 0 .7l.5.4c.4.2.8.4 1.1.6.5.3 1 .8 1.1 1.4.2.9-.1 1.7-.9 2.3-.5.4-.7.6-1.4.6-1.4 0-2.5.1-3.4-.2-.1.2-.1.2-.2.1zm-3.5.3c.1-.7.1-.7.2-1 .5-2.2 1-4.5 1.4-6.7.1-.2.1-.3.3-.3H18c-.2 1.2-.4 2.1-.7 3.2-.3 1.5-.6 3-1 4.5 0 .2-.1.2-.3.2M5 8.2c0-.1.2-.2.3-.2h3.4c.5 0 .9.3 1 .8l.9 4.4c0 .1 0 .1.1.2 0-.1.1-.1.1-.1l2.1-5.1c-.1-.1 0-.2.1-.2h2.1c0 .1 0 .1-.1.2l-3.1 7.3c-.1.2-.1.3-.2.4-.1.1-.3 0-.5 0H9.7c-.1 0-.2 0-.2-.2L7.9 9.5c-.2-.2-.5-.5-.9-.6-.6-.3-1.7-.5-1.9-.5L5 8.2z" fill="#142688"></path></svg>
+            </li>
+
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  $(document).ready(function(){
+    $(".button_variant_selector").click(function(){
+      $('.button_variant_selector').removeClass('selected')
+      $(this).addClass("selected")
+      var variant_id = $(this)[0].innerText
+      console.log(variant_id)
+      $('#ProductSelect-static-canvas-template-option-0').val(variant_id)
+      $('#ProductSelect-static-canvas-template-option-0').change()
+    })
+  })
+
+  function press_atc(){
+    $('#AddToCart').click()
+  }
+</script>
+{% unless product == empty %}
+<script type="application/json" id="ProductJson-{{ section.id }}">
+    {{ product | json }}
+</script>
+{% include 'ws-product-script' %}
+{% endunless %}
+
+{% if current_variant == blank %}
+<script>
+  var productOptions = [];
+  {% for option in product.options -%}
+  var optionObj = {};
+  optionObj[ {{ forloop.index0 }} ] = "{{ product.options[forloop.index0] }}";
+  productOptions.push(optionObj);
+  {%- endfor %}
+  </script>
+{% endif %}
+
+
+{% schema %}
+{
+"name": {
+"de": "Produktseiten",
+"en": "Product pages",
+"es": "Páginas de productos",
+"fr": "Pages de produits",
+"it": "Pagine di prodotto",
+"ja": "商品ページ",
+"nl": "Productpagina's",
+"pt-BR": "Páginas de produtos",
+"zh-CN": "产品页面",
+"zh-TW": "產品頁面"
+},
+"settings": [
+{
+"type": "checkbox",
+"id": "product_vendor_enable",
+"label": {
+"de": "Produktverkäufer anzeigen",
+"en": "Show product vendor",
+"es": "Mostrar proveedor del producto",
+"fr": "Afficher le distributeur du produit",
+"it": "Mostra fornitore prodotto",
+"ja": "商品の販売元を表示する",
+"nl": "Productleverancier weergeven",
+"pt-BR": "Exibir o fornecedor do produto",
+"zh-CN": "显示产品厂商",
+"zh-TW": "顯示產品廠商"
+}
+},
+{
+"type": "checkbox",
+"id": "product_quantity_enable",
+"label": {
+"de": "Quantitäts-Auswahl anzeigen",
+"en": "Show quantity selector",
+"es": "Mostrar selector de cantidad",
+"fr": "Afficher le sélecteur de quantité",
+"it": "Mostra selettore quantità",
+"ja": "数量セレクターを表示する",
+"nl": "Hoeveelheidskiezer weergeven",
+"pt-BR": "Exibir seletor de quantidade",
+"zh-CN": "显示数量选择器",
+"zh-TW": "顯示數量選擇器"
+}
+},
+{
+"type": "select",
+"id": "product_image_zoom_type",
+"label": {
+"de": "Bildzoomtyp",
+"en": "Image zoom type",
+"es": "Tipo de zoom de imagen",
+"fr": "Type de zoom sur image",
+"it": "Tipo di zoom immagine",
+"ja": "画像のズームタイプ",
+"nl": "Type zoom-afbeelding",
+"pt-BR": "Tipo de zoom da imagem",
+"zh-CN": "图片缩放类型",
+"zh-TW": "圖片縮放類型"
+},
+"options": [
+{
+"value": "lightbox",
+"label": {
+"de": "Leuchtkasten",
+"en": "Lightbox",
+"es": "Lightbox",
+"fr": "Visionneuse d'image",
+"it": "Lightbox",
+"ja": "Lightbox",
+"nl": "Lightbox",
+"pt-BR": "Lightbox",
+"zh-CN": "灯箱",
+"zh-TW": "燈箱"
+}
+},
+{
+"value": "zoom-in",
+"label": {
+"de": "Heranzoomen",
+"en": "Zoom-in",
+"es": "Acercar",
+"fr": "Zoom avant",
+"it": "Zoom avanti",
+"ja": "ズームイン",
+"nl": "Inzoomen",
+"pt-BR": "Mais zoom",
+"zh-CN": "缩小",
+"zh-TW": "放大"
+}
+},
+{
+"value": "no-zoom",
+"label": {
+"de": "Nicht zoomen",
+"en": "No zoom",
+"es": "Sin zoom",
+"fr": "Pas de zoom",
+"it": "Nessun zoom",
+"ja": "ズームなし",
+"nl": "Geen zoom",
+"pt-BR": "Sem zoom",
+"zh-CN": "无缩放",
+"zh-TW": "無縮放"
+}
+}
+]
+},
+{
+"type": "select",
+"id": "product_thumbnails_position",
+"label": {
+"de": "Position der Miniaturansicht des Produkts",
+"en": "Product thumbnail position",
+"es": "Posición de imagen miniatura del producto",
+"fr": "Position de la vignette du produit",
+"it": "Posizione anteprima prodotto",
+"ja": "商品サムネイルの位置",
+"nl": "Positie miniatuurafbeelding product",
+"pt-BR": "Posição da miniatura de produto",
+"zh-CN": "产品缩略图位置",
+"zh-TW": "產品縮圖位置"
+},
+"options": [
+{
+"value": "right",
+"label": {
+"de": "Rechts vom Hauptbild",
+"en": "Right of main image",
+"es": "A la derecha de la imagen principal",
+"fr": "À droite de l'image principale",
+"it": "A destra dell'immagine principale",
+"ja": "メイン画像の右",
+"nl": "Rechts van hoofdafbeelding",
+"pt-BR": "À direita da imagem principal",
+"zh-CN": "主图片的右侧",
+"zh-TW": "主要圖片右方"
+}
+},
+{
+"value": "below",
+"label": {
+"de": "Unter dem Hauptbild",
+"en": "Below main image",
+"es": "Debajo de la imagen principal",
+"fr": "Sous l'image principale",
+"it": "Sotto l'immagine principale",
+"ja": "メイン画像の下",
+"nl": "Onder hoofdafbeelding",
+"pt-BR": "Abaixo da imagem principal",
+"zh-CN": "主图片的下方",
+"zh-TW": "主要圖片下方"
+}
+}
+]
+},
+{
+"type": "header",
+"content": {
+"de": "Beschreibung",
+"en": "Description",
+"es": "Descripción",
+"fr": "Description",
+"it": "Descrizione",
+"ja": "説明",
+"nl": "Beschrijving",
+"pt-BR": "Descrição",
+"zh-CN": "描述",
+"zh-TW": "說明"
+}
+},
+{
+"type": "checkbox",
+"id": "show_extra_tab",
+"label": {
+"de": "Ein Tab neben Ihrer Produktbeschreibung anzeigen",
+"en": "Show a tab next to your product description",
+"es": "Mostrar una pestaña al lado de la descripción de tu producto",
+"fr": "Afficher un onglet en regard de la description de votre produit",
+"it": "Mostra una scheda accanto alla descrizione del prodotto",
+"ja": "商品説明の横にタブを表示する",
+"nl": "Laat tabblad zien naast uw productbeschrijving",
+"pt-BR": "Exibir uma guia ao lado da descrição do seu produto",
+"zh-CN": "显示产品描述旁边的标签",
+"zh-TW": "於產品說明旁邊顯示索引標籤"
+},
+"default": false
+},
+{
+"type": "page",
+"id": "extra_tab_content",
+"label": {
+"de": "Tab-Inhalt",
+"en": "Tab content",
+"es": "Contenido de la pestaña",
+"fr": "Contenu de l'onglet",
+"it": "Contenuto della scheda",
+"ja": "タブのコンテンツ",
+"nl": "Inhoud tabblad",
+"pt-BR": "Conteúdo da guia",
+"zh-CN": "标签内容",
+"zh-TW": "索引標籤內容"
+},
+"info": {
+"de": "Der Inhalt dieser Seite wird auf der zusätzlichen Registerkarte angezeigt.",
+"en": "This page content will appear in the extra tab.",
+"es": "El contenido de esta página aparecerá en la pestaña adicional.",
+"fr": "Le contenu de cette page s'affichera dans l'onglet supplémentaire.",
+"it": "Il contenuto di questa pagina verrà visualizzato nella scheda aggiuntiva.",
+"ja": "このページのコンテンツは追加のタブに表示されます。",
+"nl": "De inhoud van deze pagina verschijnt in het extra tabblad.",
+"pt-BR": "O conteúdo dessa página aparecerá na guia extra.",
+"zh-CN": "此页内容将显示在额外标签中。",
+"zh-TW": "此頁面內容將出現在額外索引標籤。"
+}
+},
+{
+"type": "checkbox",
+"id": "social_sharing",
+"label": {
+"de": "Teilen von Produkten aktivieren",
+"en": "Enable product sharing",
+"es": "Habilitar compartir productos",
+"fr": "Activer le partage de produits",
+"it": "Permetti condivisione del prodotto",
+"ja": "商品の共有を有効にする",
+"nl": "Delen van producten inschakelen",
+"pt-BR": "Habilite o compartilhamento de produtos",
+"zh-CN": "启用产品分享",
+"zh-TW": "啟用產品分享"
+}
+},
+{
+"type": "header",
+"content": {
+"de": "Produktoptionsformular",
+"en": "Product options form",
+"es": "Formulario de opciones de producto",
+"fr": "Formulaire d'options de produit",
+"it": "Modulo delle opzioni di prodotto",
+"ja": "商品オプションのフォーム",
+"nl": "Formulier productopties",
+"pt-BR": "Formulário de opções de produtos",
+"zh-CN": "产品选项表单",
+"zh-TW": "產品選項表單"
+}
+},
+{
+"type": "checkbox",
+"id": "enable_payment_button",
+"label": {
+"de": "Dynamischen Checkout Button anzeigen",
+"en": "Show dynamic checkout button",
+"es": "Mostrar botón de pago dinámico",
+"fr": "Afficher le bouton de passage à la caisse dynamique",
+"it": "Mostra pulsante di check-out dinamico",
+"ja": "ダイナミックチェックアウトボタンを表示する",
+"nl": "Dynamische checkout knop weergeven",
+"pt-BR": "Exibir botão dinâmico de checkout",
+"zh-CN": "显示动态结账按钮",
+"zh-TW": "顯示動態結帳按鈕"
+},
+"info": {
+"de": "Jeder Kunde sieht seine bevorzugte Zahlungsmethode aus den in Ihrem Shop verfügbaren Zahlungsmethoden wie PayPal oder Apple Pay. [Mehr Infos](https://help.shopify.com/manual/using-themes/change-the-layout/dynamic-checkout)",
+"en": "Each customer will see their preferred payment method from those available on your store, such as PayPal or Apple Pay. [Learn more](https://help.shopify.com/manual/using-themes/change-the-layout/dynamic-checkout)",
+"es": "Cada cliente verá su forma de pago preferida entre las disponibles en tu tienda, como PayPal o Apple Pay. [Más información](https://help.shopify.com/manual/using-themes/change-the-layout/dynamic-checkout)",
+"fr": "Chaque client verra son moyen de paiement préféré parmi ceux qui sont proposés sur votre boutique, tels que PayPal ou Apple Pay. [En savoir plus](https://help.shopify.com/manual/using-themes/change-the-layout/dynamic-checkout)",
+"it": "Ogni cliente vedrà il suo metodo di pagamento preferito tra quelli disponibili nel tuo negozio, come PayPal o Apple Pay. [Maggiori informazioni](https://help.shopify.com/manual/using-themes/change-the-layout/dynamic-checkout)",
+"ja": "PayPalやApple Payなど、ストアで利用可能な希望の決済方法がお客様に表示されます。[もっと詳しく](https://help.shopify.com/manual/using-themes/change-the-layout/dynamic-checkout)",
+"nl": "Elke klant ziet zijn of haar beschikbare voorkeursmethode om af te rekenen, zoals PayPal of Apple Pay. [Meer informatie](https://help.shopify.com/manual/using-themes/change-the-layout/dynamic-checkout)",
+"pt-BR": "Cada cliente verá seu método de pagamento preferido dentre os disponíveis na loja, como PayPal ou Apple Pay. [Saiba mais](https://help.shopify.com/manual/using-themes/change-the-layout/dynamic-checkout)",
+"zh-CN": "每位客户都可在您商店提供的付款方式中看到他们的首选付款方式，例如 PayPal 或 Apple Pay。[了解详细信息](https://help.shopify.com/manual/using-themes/change-the-layout/dynamic-checkout)",
+"zh-TW": "每位客戶都可以在您商店內開放使用的付款方式中看見他們偏好使用的方式，如 PayPal、Apple Pay 等。[深入瞭解相關資訊](https://help.shopify.com/manual/using-themes/change-the-layout/dynamic-checkout)"
+},
+"default": true
+},
+{
+"type": "select",
+"id": "add_to_cart_width",
+"label": {
+"de": "Variantenauswahl und Schaltflächengröße",
+"en": "Variant picker and button size",
+"es": "Selector de variantes y tamaño del botón",
+"fr": "Sélecteur de variante et taille du bouton",
+"it": "Dimensione selettore variante e pulsante",
+"ja": "バリエーションピッカーとボタンサイズ",
+"nl": "Variantkiezer en knopgrootte",
+"pt-BR": "Seletor de variantes e tamanho do botão",
+"zh-CN": "多属性选择器和按钮大小",
+"zh-TW": "變體選擇器和按鈕尺寸"
+},
+"options": [
+{
+"value": "small",
+"label": {
+"de": "Klein",
+"en": "Small",
+"es": "Pequeño",
+"fr": "Petite",
+"it": "Small",
+"ja": "小",
+"nl": "Klein",
+"pt-BR": "Pequeno",
+"zh-CN": "小",
+"zh-TW": "小型"
+}
+},
+{
+"value": "medium",
+"label": {
+"de": "Mitte",
+"en": "Medium",
+"es": "Mediano",
+"fr": "Moyenne",
+"it": "Medium",
+"ja": "中",
+"nl": "Gemiddeld",
+"pt-BR": "Médio",
+"zh-CN": "中等",
+"zh-TW": "中等"
+}
+},
+{
+"value": "large",
+"label": {
+"de": "Groß",
+"en": "Large",
+"es": "Grande",
+"fr": "Grande",
+"it": "Large",
+"ja": "大",
+"nl": "Groot",
+"pt-BR": "Grande",
+"zh-CN": "大",
+"zh-TW": "大型"
+}
+}
+]
+}
+]
+}
+{% endschema %}

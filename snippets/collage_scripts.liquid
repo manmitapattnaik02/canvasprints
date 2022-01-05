@@ -1,0 +1,292 @@
+<script>
+  var iosDevice = !!navigator.platform && /iPad|iPhone|iPod/.test(navigator.platform)
+  var baseImageCurrent;
+  var baseImages = {
+    'base1': '', 'base2': '', 'base3': '', 'base4': '', 'base5': '', 'base6': '', 'base7': '', 'base8': '', 'base9': '', 'base10': '', 'base11': '', 'base12': '', 'base13': '', 'base14': '', 'base15': '', base16: ''
+  }
+  var numButtons
+  var imageUploaded = false
+
+  function closeModal() {
+    $('#myModal').hide()
+  }
+
+
+  function initOptionLables() {
+    $('form.product-form--wide .modal-content div[data-parent-id]').toArray().forEach(function (e, i) {
+      if ($(e).find('.hulkapps_option_name').text().includes('Blind Shipped')) {
+        $(e).find('.hulkapps_option_name').html("BLIND SHIPPED<span data-label='BLIND SHIPPED'>What's This?</span>")
+        return
+      }
+      if ($(e).find('.hulkapps_option_name').text().includes('Canvas Depth')) {
+        $(e).find('.hulkapps_option_name').html("CANVAS DEPTH<span data-label='CANVAS DEPTH'>What's This?</span>")
+        return
+      }
+      if ($(e).find('.hulkapps_option_name').text().includes('Hanging Kit')) {
+        $(e).find('.hulkapps_option_name').html("HANGING KIT<span data-label='HANGING KIT'>What's This?</span>")
+        return
+      }
+      if ($(e).find('.hulkapps_option_name').text().includes('Image Border')) {
+        $(e).find('.hulkapps_option_name').html("IMAGE BORDER<span data-label='IMAGE BORDER'>What's This?</span>")
+        return
+      }
+      if ($(e).find('.hulkapps_option_name').text().includes('Next Day')) {
+        $(e).find('.hulkapps_option_name').html("NEXT DAY SHIPPING<span data-label='NEXT DAY SHIPPING'>What's This?</span>")
+        return
+      }
+      if ($(e).find('.hulkapps_option_name').text().includes('Digital Proof')) {
+        $(e).find('.hulkapps_option_name').html("DIGITAL PROOF<span data-label='DIGITAL PROOF'>What's This?</span>")
+        return
+      }
+    })
+  }
+
+  $(document).ready(function () {
+
+    $('#AddToCart').click(function () {
+      $('#customily-cart-btn').hide()
+      $('#loadingButtonModal').show()
+      $('.btn-backward').hide()
+      var button = document.querySelector('#loadingButtonModal');
+      var content = document.querySelector('#loadingButtonContentModal');
+      setTimeout(function () {
+        content.textContent = 'Processing Image'
+        var counter = 0;
+        var loadingDotInterval = setInterval(function () {
+          if (counter > 48) {
+            clearInterval(loadingDotInterval)
+          }
+          counter++
+          content.textContent = 'Processing Image' + '.'.repeat(counter)
+        }, 2000)
+      }, 5000)
+
+    })
+
+
+    $('#modallauncher').click(function () {
+      if (window.innerWidth <= 900) {
+        $('#loadingButton').show()
+        $('#modallauncher').hide()
+        var button = document.querySelector('#loadingButton');
+        var content = document.querySelector('#loadingButtonContent');
+        setTimeout(function () {
+          content.textContent = 'Processing Image'
+          var counter = 0;
+          var loadingDotInterval = setInterval(function () {
+            if (counter > 48) {
+              clearInterval(loadingDotInterval)
+            }
+            counter++
+            if (counter < 30) {
+              content.textContent = 'Processing Image' + '.'.repeat(counter)
+            } else {
+              content.textContent = 'Processing Image...................................\n' + '.'.repeat(counter - 30)
+            }
+          }, 2000)
+        }, 5000)
+        $('form.product-form--wide #customily-cart-btn').trigger('click')
+      }
+      else {
+        $('#myModal').show()
+      }
+    })
+
+    // Displaying sub modal
+    $('form.product-form--wide .modal-content').on('click', 'div[data-parent-id] [data-label]', function (e) {
+      if ($('form.product-form--wide .modal-content').find('.sub-modal-item[data-sub-mod="' + $(this).attr('data-label') + '"]').length > 0) {
+        $('form.product-form--wide .modal-content').find('.modal-content--inner').addClass('is_hidden')
+        $('form.product-form--wide .modal-content').find('.sub-modal-item[data-sub-mod]').removeClass('is_active')
+        $('form.product-form--wide .modal-content').find('.sub-modal-item[data-sub-mod="' + $(this).attr('data-label') + '"]').addClass('is_active')
+      }
+    })
+
+    // Toggle sub modal to main 
+    $('form.product-form--wide .modal-content').on('click', '.action-wrap a', function (e) {
+      $(this).closest('.sub-modal-item').removeClass('is_active')
+      $('form.product-form--wide .modal-content').find('.modal-content--inner').removeClass('is_hidden')
+    })
+
+
+
+    $('.product-main--contents .product-single__photos').addClass('photo_loaded')  //Makes canvas visible on mobile
+    var changeSizeCalled = false;
+    var customUploadBtnIndex;
+    var title = window.location.pathname
+    if (title.includes('square')) {
+      $('#sizes').append('<option value = "12x12">Small - 12x12</option><option value = "18x18">Medium - 18x18</option><option value = "24x24">Large - 24x24</option><option value = "30x30">X-Large - 30x30</option>')
+    } else if (title.includes('portrait')) {
+      $('#sizes').append('<option value = "12x8">Small - 12x8</option><option value = "18x12">Medium - 18x12</option><option value = "27x18">Large - 27x18</option><option value = "36x24">X-Large - 36x24</option>')
+    } else if (title.includes('landscape')) {
+      $('#sizes').append('<option value = "8x12">Small - 8x12</option><option value = "12x18">Medium - 12x18</option><option value = "18x27">Large - 18x27</option><option value = "24x36">X-Large - 24x36</option>')
+    }
+    $('#sizes').val(window.location.pathname.split('-').pop()) //Sets size selector to current product
+
+    $('.customUploadBtn').click(function () {
+      var regex = /(\d+)+/gm
+      customUploadBtnIndex = $('.customUploadBtn').index(this)
+      $('#imginput').click()
+    })
+
+    $('.change-photo-btn').click(function () {
+      customUploadBtnIndex = $('.change-photo-btn').index(this)
+      $('#imginput').click()
+    })
+
+    $('#imginput').change(function (e) {
+      if (iosDevice) {
+        imageNameIndex = customUploadBtnIndex + 1
+        imageName = 'Image ' + imageNameIndex + '.' + $(this).val().split('.').pop()
+      } else {
+        imageName = $(this).val().split('\\').pop()
+      }
+      imageUploaded = true;
+      $('.product-single__image-wrapper').hide()
+      $('.afterUploadContent').removeClass('is_hidden')
+      document.getElementById('customily-cart-btn').style.display = 'none'
+      $('.canvas-wrapper').show()
+      $('#modallauncher').show()
+      $('.change-photo-btn:eq(' + customUploadBtnIndex + ')').removeClass('is_hidden')
+      $('.customUploadBtn:eq(' + customUploadBtnIndex + ')').addClass('uploaded_to')
+      if ($('.uploaded_to').length >= numButtons) {
+        $('#modallauncher').removeClass('button_lockout')
+      }
+      $('.customUploadBtn:eq(' + customUploadBtnIndex + ')').text(imageName)
+      customUploadBtnIndex += 1
+      var imageFile = e.target.files[0]
+      var reader = new FileReader()
+      reader.readAsDataURL(imageFile)
+      reader.onload = function () {
+        baseImageCurrent = reader.result
+        baseImages['base' + customUploadBtnIndex] = reader.result
+        engraver.setImage(customUploadBtnIndex, baseImageCurrent)
+      }
+      $('#imginput').val('')
+      var imageUploadFinished = setInterval(function () {
+        if (engraver.initReady) {
+          engraver.clearSelection()
+          clearInterval(imageUploadFinished)
+        }
+      }, 500)
+    })
+
+
+    var detectCustomily = setInterval(function () {
+      if ($('.customily-file-input').length > 0) {
+        clearInterval(detectCustomily)
+        customilyLoaded()
+      }
+    }, 500)
+
+
+    function customilyLoaded() {
+      $('#customUploadBtn').show()
+      $('#customUploadBtn').click(function () {
+        $('.customily-file-input input').last().click()
+      })
+      numButtons = $('.customily_option').length
+      for (var i = 0; i < numButtons; i++) {
+        $('#upload' + (i + 1)).removeClass('is_hidden')
+      }
+    }
+
+
+    $('#sizes').change(function () {
+      var oldHandle = window.location.pathname.split('/').pop()
+      var layout = oldHandle.split('-')[0] + '-' + oldHandle.split('-')[1] + '-'
+      var newHandle = layout + $('#sizes').val()
+      $.getJSON("/products/" + newHandle, function (productObject) {
+        product = productObject.product
+        var title = product.title,
+          price = product.variants[0].price,
+          desc = product.body_html,
+          variantId = product.variants[0].id
+        $('.call-to-action-text').text(title)
+        $('#productPrice').text('$ ' + price + ' USD')
+        $('#product-description').html(desc)
+        $('.hidden_sel').first().val(variantId)
+        if (!imageUploaded) {
+          $('.product-single__image-wrapper').find('img').attr('src', product.images[0].src)
+          //$('#ProductImage-14666156671063').attr('src', product.images[0].src)
+        } else {
+          $('#modallauncher').addClass('button_lockout')
+          $('body .product-single__photos').addClass('is_loading')
+        }
+      })
+      window.customily.options.handle = newHandle
+      window.customily.initialize()
+      if (changeSizeCalled == false) {
+        engraver.canvasWrapper.addEventListener('productLoaded', function () {
+          numButtons = $('.customUploadBtn:visible').length
+          for (var i = 0; i < numButtons; i++) {
+            if (baseImages['base' + (i + 1)] != '') {
+              engraver.setImage(i + 1, baseImages['base' + (i + 1)])
+            }
+          }
+        })
+      }
+      changeSizeCalled = true
+      var imageFullyUploaded = setInterval(function () {
+        if (engraver.initReady) {
+          setTimeout(function () {
+            engraver.clearSelection()
+            $('body .product-single__photos').removeClass('is_loading')
+            if ($('.uploaded_to').length >= numButtons) {
+              $('#modallauncher').removeClass('button_lockout')
+            }
+            $('.triptych-mover.selected').show()
+            $('#sizes').prop('disabled', false)
+            $('.lockable').removeClass('button_lockout')
+          }, 500)
+          clearInterval(imageFullyUploaded)
+        }
+      }, 500)
+    })
+  })
+
+
+
+  setTimeout(function detectHulkapps() {
+    if ($('.hulkapps_option_set').length) {
+      document.dispatchEvent(new CustomEvent('hulkappsLoadedFully'))
+      return !0
+    }
+    setTimeout(detectHulkapps, 100)
+  }, 100)
+
+  document.addEventListener('hulkappsLoadedFully', function (e) {
+    canvasDepthOption = $('.option_type_id_272051')
+
+    $.getJSON("/cart.js", function (response) {	//Checks cart to see if you already have an item with 'next day shipping'.  If so it removes the option
+      var alreadyHasFastShipping = false;
+      var numitems = response.item_count;
+      for (var i = 0; i < numitems; i++) {
+        var digital_proof = response.items[i].properties['Digital Proof']
+        var fast_shipping = response.items[i].properties['Next Day Shipping'];
+        if (fast_shipping != undefined) {
+          if (!fast_shipping.includes('No')) { //.includes is not supported in IE (last release in 2015).  If it is a significant issue this will need an alternative
+            $(".option_type_id_278946").hide();
+            $(".option_type_id_262780").hide();
+          }
+        }
+        if (digital_proof != undefined) {
+          if (!digital_proof.includes('No')) {
+            $(".option_type_id_278946").hide();
+          }
+        }
+      }
+    })
+    $("[for='278946_0']").click(function () {
+      $("[for='262780_0']").addClass("radio_selected")
+    })
+    $("[for='262780_0']").click(function () {
+      $("[for='278946_0']").addClass("radio_selected")
+    })
+
+    // if($(window).width() > 1100) swapModalOptImg(optImgs, borderTypesImgs, !0) // desktop
+    // else swapModalOptImg(mobOptImgs, mobBorderTypesImgs, 0)                    //mobile
+
+    initOptionLables()
+    $('#myModal .modal-actions--wrapper .hulkapps_submit_cart span').text('Add to cart')
+  })
+</script>

@@ -1,0 +1,13 @@
+{%- if section.settings.link == blank -%}
+  <div class="announcement-bar">
+{%- else -%}
+  <a href="{{ section.settings.link }}" >
+{%- endif -%}
+
+  <p class="announcement-bar__message">{{ section.settings.text | escape }}</p>
+
+{%- if section.settings.link == blank -%}
+  </div>
+{%- else -%}
+  </a>
+{%- endif -%}

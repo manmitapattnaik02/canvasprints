@@ -1,0 +1,221 @@
+<div id="myModal" class="modal">
+	<div class="modal-content">
+
+		<div class="modal-content--inner">
+			<div class="logo-bar">
+				<h2>Customize your canvas</h2>
+				<p>(optional)</p>
+			</div>
+
+			<div id="hulkapps_custom_options_{{ product.id }}"></div>
+
+			<div class="modal-actions--wrapper">
+				<div class="btn-backward" onclick="closeModal()">
+					<span>Back</span>
+				</div>
+				<div id="loadingButtonModal" class='is_hidden'>
+					<p id="loadingButtonContentModal">Processing</p>
+				</div>
+				<div id="modalAddToCart"><span id="modalATCtext">{{ 'products.product.add_to_cart' | t}}</span></div>
+				<span id='addToCartButtonModalWrapper'>
+					<button type="submit" name="add" id="AddToCart"
+						class="btn {{ btn_class }}{% if section.settings.enable_payment_button %} btn--secondary{% endif %}">
+						<span id="AddToCartText">{{ 'products.product.add_to_cart' | t }}</span>
+					</button>
+				</span>
+			</div>
+		</div>
+
+
+
+		<!-- BLIND SHIPPING [START] -->
+		<div class="sub-modal-item" data-sub-mod="BLIND SHIPPED">
+			<div class="logo-bar">
+				<p style="font-size:30px;"><strong>BLIND SHIPPING</strong></p>
+			</div>
+			<div class="desc-wrap">
+				<div class="contents">
+					<p>This is where we remove any mention of our company on the packaging, within the packing, and on the
+						product.</p>
+					<p>This will allow you to ship your product to a customer, without any relation back to our company.</p>
+					<p>Please see the images provided below for a visual representation of the removal of our name on the product.
+					</p>
+				</div>
+				<div class="gallery-wrap blind-shipping">
+					<div class="img-wrap">
+						<img src="{{ 'option-blind-ship-with-logo.png' | file_img_url: '400x' }}" alt="Canvas Prints">
+						<p>With Blind Shipping</p>
+					</div>
+					<div class="img-wrap">
+						<img src="{{ 'option-blind-ship-without-logo.png' | file_img_url: '400x' }}" alt="Canvas Prints">
+						<p>Without Blind Shipping</p>
+					</div>
+				</div>
+			</div>
+			<div class="action-wrap"><a href="javascript:;">Back</a></div>
+		</div>
+		<!-- BLIND SHIPPING [END] -->
+		<!-- CANVAS DEPTH [START] -->
+		<div class="sub-modal-item" data-sub-mod="CANVAS DEPTH">
+			<div class="logo-bar">
+				<p style="font-size:30px;"><strong>CANVAS DEPTH</strong></p>
+			</div>
+			<div class="desc-wrap">
+				<div class="contents">
+					<p>At CanvasPrints.com, we offer two great options for canvas depth.</p>
+					<p>Our first option is for a .75" canvas deptch and is a free opton.</p>
+					<p>Our second option is a $6 upgrade for a 1.5" canvas depth, which will upgrade your canvas into a ready to
+						hang masterpiece with Gallery style thickness.</p>
+				</div>
+				<div class="gallery-wrap">
+					<img src="{{ 'new-depth-with-text.jpg' | file_img_url: '700x' }}" alt="Canvas Prints">
+				</div>
+			</div>
+			<div class="action-wrap"><a href="javascript:;">Back</a></div>
+		</div>
+		<!-- CANVAS DEPTH [END] -->
+		<!-- HANGING KITS [START] -->
+		<div class="sub-modal-item" data-sub-mod="HANGING KIT">
+			<div class="logo-bar">
+				<p style="font-size:30px;"><strong>HANGING KITS</strong></p>
+			</div>
+			<div class="desc-wrap">
+				<div class="contents">
+					<p>All of our canvas prints come ready to hang due to our inclusion of a sawtooth mounted hanging kit.</p>
+					<p>However, if you want an upgraded way to hang your canvas, you can choose to add a premium hanging kit.</p>
+					<p>This kit turns your canvas into a gallery ready canvas, that has a professional inlaid wire included within
+						the print.</p>
+				</div>
+				<div class="gallery-wrap">
+					<img src="{{ 'option-v2-hanging-kit.png' | file_img_url: '200x' }}" alt="Canvas Prints">
+				</div>
+			</div>
+			<div class="action-wrap"><a href="javascript:;">Back</a></div>
+		</div>
+		<!-- HANGING KITS [END] -->
+		<!-- IMAGE BORDER [START] -->
+		<div class="sub-modal-item" data-sub-mod="IMAGE BORDER">
+			<div class="logo-bar">
+				<p style="font-size:30px;"><strong>IMAGE BORDER TYPE</strong></p>
+			</div>
+			<div class="desc-wrap">
+				<div class="contents">
+					<p>We offer numberous border types for every canvas print. <br>you can take your choice from the following:
+					</p>
+					<p>
+						Blur (free)<br>
+						White (+$6)<br>
+						Black (+$6)<br>
+						Grey (+$6)<br>
+						Mirror (+$6)
+					</p>
+					<p>Please see examples below.</p>
+				</div>
+				<div class="gallery-wrap img-border">
+					<div class="img-wrap">
+						<img src="{{ 'option-v2-border-blur.png' | file_img_url: '300x' }}" alt="Canvas Prints">
+						<p>Blur</p>
+					</div>
+					<div class="img-wrap">
+						<img src="{{ 'option-v2-border-white.png' | file_img_url: '300x' }}" alt="Canvas Prints">
+						<p>White</p>
+					</div>
+					<div class="img-wrap">
+						<img src="{{ 'option-v2-border-black.png' | file_img_url: '300x' }}" alt="Canvas Prints">
+						<p>Black</p>
+					</div>
+					<div class="img-wrap">
+						<img src="{{ 'option-v2-border-gray.png' | file_img_url: '300x' }}" alt="Canvas Prints">
+						<p>Grey</p>
+					</div>
+					<div class="img-wrap">
+						<img src="{{ 'option-v2-border-mirror.png' | file_img_url: '300x' }}" alt="Canvas Prints">
+						<p>Mirror</p>
+					</div>
+				</div>
+			</div>
+			<div class="action-wrap"><a href="javascript:;">Back</a></div>
+		</div>
+		<!-- IMAGE BORDER [END] -->
+		<!-- DIGITAL PROOF [START] -->
+		<div class="sub-modal-item" data-sub-mod="DIGITAL PROOF">
+			<div class="logo-bar">
+				<p style="font-size:30px;"><strong>DIGITAL PROOF</strong></p>
+			</div>
+			<div class="desc-wrap">
+				<div class="contents">
+					<p>This option allows us to send you a digital mock-up of what your final order will look like.</p>
+					<p>If you choose this option, next day shipping will not be available, as it takes at least one business day
+						to create a digital proof.</p>
+					<p></p>
+				</div>
+				<div class="gallery-wrap">
+					<div class="empty-img"></div>
+				</div>
+			</div>
+			<div class="action-wrap"><a href="javascript:;">Back</a></div>
+		</div>
+		<!-- DIGITAL PROOF [END] -->
+		<!-- NEXT DAY SHIPPING [START] -->
+		<div class="sub-modal-item" data-sub-mod="NEXT DAY SHIPPING">
+			<div class="logo-bar">
+				<p style="font-size:30px;"><strong>NEXT DAY SHIPPING</strong></p>
+			</div>
+			<div class="desc-wrap">
+				<div class="contents">
+					<p>If you choose our 'ships next day' option, we will place your order in the mail by the next business day.
+					</p>
+					<p id='timeinmail'>If you do not select next day shipping, we estimate your order will go in the mail between
+					</p>
+					<p>This is based on your order being placed before 3 PM EST on any given business day.</p>
+				</div>
+				<div class="gallery-wrap">
+					<div class="empty-img"></div>
+				</div>
+			</div>
+			<div class="action-wrap"><a href="javascript:;">Back</a></div>
+		</div>
+		<!-- NEXT DAY SHIPPING [END] -->
+	</div>
+</div>
+
+<script>
+	Date.prototype.addDays = function (days) {
+		var date = new Date(this.valueOf());
+		date.setDate(date.getDate() + days);
+		return date;
+	}
+
+	var est_hour = new Date().getUTCHours() - 4
+	if (est_hour > 14) {	//if the time is after 3pm EST
+		var min_days_to_add = 3
+		var max_days_to_add = 8
+	} else {
+		var min_days_to_add = 2
+		var max_days_to_add = 7
+	}
+
+	var localDate = new Date()
+	var min_date = localDate
+	var max_date = localDate
+
+	while (min_days_to_add > 0) {
+
+		if (min_date.getDay() != 0 && min_date.getDay() != 6) {
+			min_days_to_add -= 1
+		}
+		min_date = min_date.addDays(1)
+	}
+
+	while (max_days_to_add > 0) {
+		if (max_date.getDay() != 0 && max_date.getDay() != 6) {
+			max_days_to_add -= 1
+		}
+		max_date = max_date.addDays(1)
+	}
+
+	var formatted_min_date = min_date.getMonth() + 1 + '/' + min_date.getDate() + '/' + min_date.getFullYear()
+	var formatted_max_date = max_date.getMonth() + 1 + '/' + max_date.getDate() + '/' + max_date.getFullYear()
+	document.getElementById("timeinmail").textContent += formatted_min_date
+	document.getElementById("timeinmail").textContent += ' to ' + formatted_max_date
+</script>

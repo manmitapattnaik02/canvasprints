@@ -1,0 +1,24 @@
+{% comment %}
+The contents of the product.liquid template can be found in /sections/product-template.liquid
+{% endcomment %}
+<div class="wrapper">
+  <div class="grid">
+    <div class="grid__item">
+      {% section 'product-colorlab-template' %}
+    </div>
+  </div>
+</div>
+
+{% section 'product-guarantee' %}
+
+<div class="wrapper">
+  <div class="grid">
+    <div class="grid__item">
+      {% section 'product-recommendations' %}
+    </div>
+  </div>
+</div>
+
+
+<!-- Please Keep For SEO Purposes -->
+<link rel="canonical" href="{{ canonical_url }}" />
